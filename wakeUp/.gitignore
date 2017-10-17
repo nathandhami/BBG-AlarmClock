@@ -1,0 +1,17 @@
+# Debug log files
+logs
+*.log
+
+# Dependency directory
+node_modules
+
+
+# Webpack Source Maps
+*.map
+
+# Local env file with credentials
+.env
+
+# IDE
+.idea/
+*.swp
