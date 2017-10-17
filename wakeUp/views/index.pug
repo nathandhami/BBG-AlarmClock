@@ -1,5 +1,24 @@
-extends layout
-
+extends placeholders/header.pug
 block content
-  h1= title
-  p Welcome to #{title}
+	style#clock-animations.
+	link(rel='stylesheet', type='text/css', href='/stylesheets/index.css')
+	.clock-wrapper
+		.clock-base
+			.click-indicator
+				div
+				div
+				div
+				div
+				div
+				div
+				div
+				div
+				div
+				div
+				div
+				div
+			.clock-hour
+			.clock-minute
+			.clock-second
+			.clock-center
+	script(type='text/javascript', src='javascripts/index.js')
