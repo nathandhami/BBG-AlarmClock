@@ -1,0 +1,19 @@
+GPIO_71 --> pin 1 col 1
+GPIO_73 --> pin 2 col 2
+GPIO_75 --> pin 3 col 3
+GPIO_77 --> pin 4 col 4
+GPIO_79 --> pin 5 Row 1
+GPIO_80 --> pin 6 Row 2
+GPIO_81 --> pin 7 Row 3
+GPIO_11 --> pin 8 Row 4
+
+col pins are output
+row pins are input
+
+
+
+1 2 3 A  Row 4
+4 5 6 B  Row 3
+7 8 9 C  Row 2
+* 0 # D  Row 1
+

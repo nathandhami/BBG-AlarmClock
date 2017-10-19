@@ -1,0 +1,6 @@
+# Eclipse files
+*.settings
+.project
+.cproject
+
+# Misc files
