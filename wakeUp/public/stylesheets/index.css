@@ -177,6 +177,17 @@ html, body{
     margin: auto;
 }
 
+.hide-close-button {
+    float: right;
+    margin-top: 3px;
+    font-size: 2em;
+    font-family: helvetica;
+    color: rgba(165, 48, 69, 0.8);
+    display: none;
+    background: transparent;
+    border: none;
+}
+
 .a-list {
     left: 0;
     right: 0;
@@ -185,6 +196,10 @@ html, body{
 
 .a-list:hover {
     background: rgba(142, 61, 91, 0.3);
+}
+
+.a-list:hover .hide-close-button {
+    display: block;
 }
 
 .btn-primary, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
