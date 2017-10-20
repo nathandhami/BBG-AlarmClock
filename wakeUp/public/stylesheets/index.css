@@ -180,6 +180,11 @@ html, body{
 .a-list {
     left: 0;
     right: 0;
+    border-radius: 5px;
+}
+
+.a-list:hover {
+    background: rgba(142, 61, 91, 0.3);
 }
 
 .btn-primary, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
@@ -253,4 +258,36 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+/*.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+}*/
+.btn-circle-lg {
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    padding: 10px 16px;
+    font-size: 12px;
+    line-height: 1.33;
+    border-radius: 25px;
+    border-color: #bc5151;
+    color: white;
+    background-color: #bc5151;
+}
+
+.btn-circle-lg:active, .btn-circle-lg:visited, .btn-circle-lg:focus {
+    background-color: #bc5151;
+}
+
+.btn-circle-lg:hover {
+    color: white;
+    border-color: #b74e4e;
+    background-color: #b74e4e;
 }
