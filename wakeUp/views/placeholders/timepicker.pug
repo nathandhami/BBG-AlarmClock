@@ -3,11 +3,15 @@
     .modal-content
       .modal-header
         button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
-        h4#myModalLabel Set Alarm
+        h3#myModalLabel Skill-testing Alarm-Clock
       .modal-body
-        input(type='hidden', name='_csrf', value="")
-        form#time-form-horizontal.col-sm-12(role="form", data-toggle="validator")
-          .form-group.col-sm-5
+        h5(style='margin: 0') <ul style="margin: 0">
+          |   <li>Set Alarm Time</li>
+          |   <li>Select repeating days</li>
+          |   <li>Choose Difficulty</li>
+          | </ul>
+        form#timeForm.form-horizontal.col-sm-12(action="/alarm/set", method="post", role="form")
+          .form-group.col-sm-5(style='margin-top: 30px')
             .input-group.bootstrap-timepicker.timepicker
               input.timepicker1.form-control.input-small(type="text")
               span.input-group-addon
@@ -34,19 +38,18 @@
             label.btn.btn-default.btn-circle
               input#option3(type="checkbox", autocomplete="off")
               |  S
-          .form-group.btn-group.col-sm-12(data-toggle="buttons")
+          .form-group.btn-group.col-sm-12.difficulty-level(data-toggle="buttons")
             label.btn.btn-info.active
-              input#option1(type="radio", name="options", autocomplete="off", checked="")
+              input#option1(type="radio", autocomplete="off", checked="")
               |  Easy
             label.btn.btn-info
-              input#option2(type="radio", name="options", autocomplete="off")
+              input#option2(type="radio", autocomplete="off")
               |  Medium
             label.btn.btn-info
-              input#option3(type="radio", name="options", autocomplete="off")
+              input#option3(type="radio", autocomplete="off")
               |  Hard
-          .form-group.col-sm-12
-            button.btn.btn-success.pull-right(type='submit') Done
-            p#form-error.help-block.pull-left.text-danger.hide   The form is not valid        
+          .form-group
+            button.btn.btn-success.pull-right(type='submit', style='margin-left: 1em;') Set Alarm
+            button.btn.pull-right(data-dismiss='modal', aria-hidden='true') Cancel     
       .modal-footer
-        button.btn(data-dismiss='modal', aria-hidden='true') Cancel
 
