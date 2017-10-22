@@ -240,6 +240,7 @@ html, body{
 .btn-primary, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
     background: transparent;
     border-color: transparent;
+    outline: none;
 }
 
 .switch {
