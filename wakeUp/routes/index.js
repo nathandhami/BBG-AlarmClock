@@ -50,4 +50,21 @@ router.route('/alarm/set')
     res.redirect('/');
   });
 
+
+router.route('/alarm/delete')
+  .post((req, res, next) => {
+    var id = xssFilters.inHTMLData(req.body.alarmId);
+    console.log("ALARM: " + id);
+
+    Alarm.findOne({'identification': id}).exec((err, alarm) => {
+      if (err || alarm == null) {
+        throw err;
+      } else {
+          alarm.remove();
+          res.redirect('/');
+      }
+    });
+
+  });
+
 module.exports = router;
