@@ -17,6 +17,7 @@
     "morgan": "~1.9.0",
     "nodemon": "^1.12.1",
     "pug": "2.0.0-beta11",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "xss-filters": "^1.2.7"
   }
 }
