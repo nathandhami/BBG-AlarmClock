@@ -337,3 +337,10 @@ input:checked + .slider:before {
     border-color: #b74e4e;
     background-color: #b74e4e;
 }
+
+.timepicker {
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 40%;
+}

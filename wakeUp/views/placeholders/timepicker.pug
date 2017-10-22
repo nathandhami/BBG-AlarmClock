@@ -1,0 +1,19 @@
+#timeModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+        h3#myModalLabel Set Alarm
+      .modal-body
+        form#time-form-horizontal.col-sm-12(role="form", data-toggle="validator")
+          .form-group
+            .input-group.bootstrap-timepicker.timepicker
+              input.timepicker1.form-control.input-small(type="text")
+              span.input-group-addon
+                i.glyphicon.glyphicon-time
+          .form-group
+            button.btn.btn-success.pull-right(type='submit') Done
+            p#form-error.help-block.pull-left.text-danger.hide   The form is not valid.
+      .modal-footer
+        button.btn(data-dismiss='modal', aria-hidden='true') Cancel
+
