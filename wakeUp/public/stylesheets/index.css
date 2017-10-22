@@ -191,7 +191,7 @@ html, body{
 .a-list {
     left: 0;
     right: 0;
-    border-radius: 5px;
+    padding-top: 2px;
 }
 
 .a-list:hover {
@@ -202,13 +202,36 @@ html, body{
     display: block;
 }
 
-.btn-primary, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
-    background: transparent;
+.hard-level {
+    border-top: 3px solid darkred;
 }
 
-.btn-primary:hover {
+.medium-level {
+    border-top: 3px solid yellow;
+}
+
+.easy-level {
+    border-top: 3px solid darkgreen;
+}
+
+.hard-level .btn-primary:hover {
     background: transparent;
-    border-color: #bc6969;
+    border-color: darkred;
+}
+
+.medium-level .btn-primary:hover {
+    background: transparent;
+    border-color: yellow;
+}
+
+.easy-level .btn-primary:hover {
+    background: transparent;
+    border-color: darkgreen;
+}
+
+.btn-primary, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
+    background: transparent;
+    border-color: transparent;
 }
 
 .switch {
