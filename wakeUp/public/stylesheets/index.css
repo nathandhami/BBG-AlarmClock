@@ -191,7 +191,6 @@ html, body{
 .a-list {
     left: 0;
     right: 0;
-    padding-top: 2px;
 }
 
 .a-list:hover {
@@ -202,31 +201,40 @@ html, body{
     display: block;
 }
 
-.hard-level {
-    border-top: 3px solid darkred;
+.half-border {
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 90%;
+  border-top: 2px solid;
+  padding-bottom: 3px;
 }
 
-.medium-level {
-    border-top: 3px solid yellow;
+.hard-level .half-border {
+    border-top-color: #bc1c1c;
 }
 
-.easy-level {
-    border-top: 3px solid darkgreen;
+.medium-level .half-border {
+    border-top-color: #e8cf19;
+}
+
+.easy-level .half-border {
+    border-top-color: #3ba024;
 }
 
 .hard-level .btn-primary:hover {
     background: transparent;
-    border-color: darkred;
+    border-color: #bc1c1c;
 }
 
 .medium-level .btn-primary:hover {
     background: transparent;
-    border-color: yellow;
+    border-color: #e8cf19;
 }
 
 .easy-level .btn-primary:hover {
     background: transparent;
-    border-color: darkgreen;
+    border-color: #3ba024;
 }
 
 .btn-primary, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
