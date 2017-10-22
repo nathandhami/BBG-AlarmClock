@@ -16,5 +16,6 @@ $(document).ready(function() {
 
   document.getElementById("clock-animations").innerHTML = stylesDeg;
 
+  $('.timepicker1').timepicker();
 });
 
