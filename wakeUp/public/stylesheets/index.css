@@ -306,7 +306,7 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
-/*.btn-circle {
+.btn-circle {
     width: 30px;
     height: 30px;
     text-align: center;
@@ -314,7 +314,9 @@ input:checked + .slider:before {
     font-size: 12px;
     line-height: 1.428571429;
     border-radius: 15px;
-}*/
+    border: none;
+}
+
 .btn-circle-lg {
     width: 45px;
     height: 45px;
@@ -338,9 +340,6 @@ input:checked + .slider:before {
     background-color: #b74e4e;
 }
 
-.timepicker {
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    width: 40%;
+.weekdays {
+    float: right;
 }
