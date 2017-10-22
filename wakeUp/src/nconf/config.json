@@ -1,0 +1,11 @@
+{
+  "http": {
+    "port": 3000
+  },
+  "db":{
+    "url": "mongodb://localhost/users"
+  },
+  "session": {
+    "secret": "skill-alarm"
+  }
+}

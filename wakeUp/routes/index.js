@@ -1,20 +1,29 @@
 var express = require('express');
 var xssFilters = require('xss-filters');
+var Alarm = require('../models/Alarm');
 var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { 
-  	title: 'Wake Up' 
-  });
+    Alarm.find({}, function(err, alarms) {
+	    if (err){ 
+	    	throw err;
+	    } 
+	    else {
+	    	res.render('index', { 
+			  	title: 'Wake Up',
+			  	alarms: alarms,
+			});
+	    }
+	});
 });
 
 router.route('/alarm/set')
   .post((req, res) => {
-    var time = xssFilters.inHTMLData(req.body.time);
+    var alarmTime = xssFilters.inHTMLData(req.body.time);
 
     var days = [];
-    var level =[];
+    var diff_level;
 
     days.push(xssFilters.inHTMLData(req.body.sunday));
     days.push(xssFilters.inHTMLData(req.body.monday));
@@ -24,15 +33,19 @@ router.route('/alarm/set')
     days.push(xssFilters.inHTMLData(req.body.friday));
     days.push(xssFilters.inHTMLData(req.body.saturday));
 
-    level.push(xssFilters.inHTMLData(req.body.level_easy));
-    level.push(xssFilters.inHTMLData(req.body.level_med));
-    level.push(xssFilters.inHTMLData(req.body.level_hard));
+    diff_level = xssFilters.inHTMLData(req.body.level);
 
-    console.log(time);
-    console.log(days);
-    console.log(level);
+    const alarm = new Alarm({
+      time: alarmTime,
+      days: days,
+      level: diff_level,
+    });
 
-    // TODO: set alarm through C application
+    alarm.save((err, posting) => {
+      if (err) throw err;
+    });
+
+	// TODO: set alarm through C application
 
     res.redirect('/');
   });

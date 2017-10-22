@@ -40,13 +40,13 @@
               |  S
           .form-group.btn-group.col-sm-12.difficulty-level(data-toggle="buttons")
             label.btn.btn-info.active
-              input(type="radio", name="level_easy", autocomplete="off", value="")
+              input(type="radio", name="level", autocomplete="off", checked, value="easy")
               |  Easy
             label.btn.btn-info
-              input(type="radio", name="level_med", autocomplete="off")
+              input(type="radio", name="level", autocomplete="off", value="medium")
               |  Medium
             label.btn.btn-info
-              input(type="radio", name="level_hard", autocomplete="off")
+              input(type="radio", name="level", autocomplete="off", value="hard")
               |  Hard
           .form-group
             button.btn.btn-success.pull-right(type='submit', style='margin-left: 1em;') Set Alarm

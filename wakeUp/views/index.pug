@@ -2,6 +2,7 @@ extends placeholders/header.pug
 block content
 	style#clock-animations.
 	link(rel='stylesheet', type='text/css', href='/stylesheets/index.css')
+	include ./mixins/alarm-item.pug
 	.clock-div
 		.clock-wrapper
 			.clock-base
@@ -23,45 +24,57 @@ block content
 				.clock-second
 				.clock-center
 	.alarm-div.col-xs-10
-		a.a-list.col-xs-4.form-group.hard-level
-			.half-border
-			button.btn.btn-primary.btn-lg 09:00 AM
-			label.switch
-				input(type="checkbox")
-				span.slider.round
-			button.hide-close-button
-				i.glyphicon.glyphicon-remove
-		a.a-list.col-xs-4.form-group.medium-level
-			.half-border
-			button.btn.btn-primary.btn-lg 09:00 AM
-			label.switch
-				input(type="checkbox")
-				span.slider.round
-			button.hide-close-button
-				i.glyphicon.glyphicon-remove
-		a.a-list.col-xs-4.form-group.easy-level
-			.half-border
-			button.btn.btn-primary.btn-lg 09:00 AM
-			label.switch
-				input(type="checkbox")
-				span.slider.round
-			button.hide-close-button
-				i.glyphicon.glyphicon-remove
-		a.a-list.col-xs-4.form-group.easy-level
-			.half-border
-			button.btn.btn-primary.btn-lg 09:00 AM
-			label.switch
-				input(type="checkbox")
-				span.slider.round
-			button.hide-close-button
-				i.glyphicon.glyphicon-remove
-		a.a-list.col-xs-4.form-group
-			button.btn.btn-primary.btn-lg 09:00 AM
-			label.switch
-				input(type="checkbox")
-				span.slider.round
-			button.hide-close-button
-				i.glyphicon.glyphicon-remove
+		- for (let i = 0; i < alarms.length; i++) {
+			+alarm-item(alarms[i].time, alarms[i].level)
+			// if (levelBooleans[i][0]) {
+			// 	console.log("easy");
+			// }
+			// if (levelBooleans[i][1]) {
+			// 	console.log("med");
+			// }
+			// if (levelBooleans[i][2]) {
+			// 	console.log("hard");
+			// }
+		- }
+		//- a.a-list.col-xs-4.form-group.hard-level
+		//- 	.half-border
+		//- 	button.btn.btn-primary.btn-lg 09:00 AM
+		//- 	label.switch
+		//- 		input(type="checkbox")
+		//- 		span.slider.round
+		//- 	button.hide-close-button
+		//- 		i.glyphicon.glyphicon-remove
+		//- a.a-list.col-xs-4.form-group.medium-level
+		//- 	.half-border
+		//- 	button.btn.btn-primary.btn-lg 09:00 AM
+		//- 	label.switch
+		//- 		input(type="checkbox")
+		//- 		span.slider.round
+		//- 	button.hide-close-button
+		//- 		i.glyphicon.glyphicon-remove
+		//- a.a-list.col-xs-4.form-group.easy-level
+		//- 	.half-border
+		//- 	button.btn.btn-primary.btn-lg 09:00 AM
+		//- 	label.switch
+		//- 		input(type="checkbox")
+		//- 		span.slider.round
+		//- 	button.hide-close-button
+		//- 		i.glyphicon.glyphicon-remove
+		//- a.a-list.col-xs-4.form-group.easy-level
+		//- 	.half-border
+		//- 	button.btn.btn-primary.btn-lg 09:00 AM
+		//- 	label.switch
+		//- 		input(type="checkbox")
+		//- 		span.slider.round
+		//- 	button.hide-close-button
+		//- 		i.glyphicon.glyphicon-remove
+		//- a.a-list.col-xs-4.form-group
+		//- 	button.btn.btn-primary.btn-lg 09:00 AM
+		//- 	label.switch
+		//- 		input(type="checkbox")
+		//- 		span.slider.round
+		//- 	button.hide-close-button
+		//- 		i.glyphicon.glyphicon-remove
 		a.a-list.col-xs-4.form-group
 			button.btn.btn-default.btn-circle-lg(href='#', data-toggle='modal', data-target='#timeModal')
 				i.glyphicon.glyphicon-plus

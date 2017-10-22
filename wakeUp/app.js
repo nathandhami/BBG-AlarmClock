@@ -4,10 +4,30 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+const nconf = require('./src/nconf/nConfig');
+const mongoose = require('mongoose');
+const expressSession = require('express-session');
+const MongoStore = require('connect-mongo')(expressSession);
 
 var index = require('./routes/index');
 
 var app = express();
+
+mongoose.connect(nconf.get('db:url'));
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'mongodb connection error:'));
+
+// Session and Cookie configuration
+app.use(expressSession({
+  name: 'wakeUpId',
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+    ttl: 1 * 60 * 60, // 1 hr
+  }),
+  secret: nconf.get('session:secret'),
+  resave: false,
+  saveUninitialized: false,
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
