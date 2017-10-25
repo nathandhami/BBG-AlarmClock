@@ -188,6 +188,10 @@ html, body{
     border: none;
 }
 
+#delForm {
+    float: right;
+}
+
 .a-list {
     left: 0;
     right: 0;
@@ -339,6 +343,10 @@ input:checked + .slider:before {
     color: white;
     border-color: #b74e4e;
     background-color: #b74e4e;
+}
+
+.add-icon {
+    text-align: center;
 }
 
 .weekdays {

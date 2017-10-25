@@ -18,35 +18,35 @@
                 i.glyphicon.glyphicon-time
           .form-group.btn-group.col-sm-6.weekdays(data-toggle="buttons")
             label.btn.btn-default.btn-circle
-              input(type="checkbox", name="sunday", autocomplete="off")
+              input#day1(type="checkbox", name="sunday", autocomplete="off")
               |  S
             label.btn.btn-default.btn-circle
-              input#option2(type="checkbox", name="monday", autocomplete="off")
+              input#day2(type="checkbox", name="monday", autocomplete="off")
               |  M
             label.btn.btn-default.btn-circle
-              input#option3(type="checkbox", name="tuesday", autocomplete="off")
+              input#day3(type="checkbox", name="tuesday", autocomplete="off")
               |  T
             label.btn.btn-default.btn-circle
-              input#option1(type="checkbox", name="wednesday", autocomplete="off")
+              input#day4(type="checkbox", name="wednesday", autocomplete="off")
               |  W
             label.btn.btn-default.btn-circle
-              input#option2(type="checkbox", name="thursday", autocomplete="off")
+              input#day5(type="checkbox", name="thursday", autocomplete="off")
               |  T
             label.btn.btn-default.btn-circle
-              input#option3(type="checkbox", name="friday", autocomplete="off")
+              input#day6(type="checkbox", name="friday", autocomplete="off")
               |  F
             label.btn.btn-default.btn-circle
-              input#option3(type="checkbox", name="saturday", autocomplete="off")
+              input#day7(type="checkbox", name="saturday", autocomplete="off")
               |  S
           .form-group.btn-group.col-sm-12.difficulty-level(data-toggle="buttons")
             label.btn.btn-info.active
-              input(type="radio", name="level_easy", autocomplete="off", value="")
+              input#radio1(type="radio", name="level", autocomplete="off", checked, value="easy")
               |  Easy
             label.btn.btn-info
-              input(type="radio", name="level_med", autocomplete="off")
+              input#radio2(type="radio", name="level", autocomplete="off", value="medium")
               |  Medium
             label.btn.btn-info
-              input(type="radio", name="level_hard", autocomplete="off")
+              input#radio3(type="radio", name="level", autocomplete="off", value="hard")
               |  Hard
           .form-group
             button.btn.btn-success.pull-right(type='submit', style='margin-left: 1em;') Set Alarm
