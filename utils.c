@@ -10,7 +10,7 @@
 
 #define EXPORT_FILE "/sys/class/gpio/export"
 
-void writeToExportFile(int pinNumber)
+void Utils_writeToExportFile(int pinNumber)
 {
 	FILE *pFile = fopen(EXPORT_FILE, "w");
 
