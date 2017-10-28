@@ -3,8 +3,8 @@ OUTFILE = alarmclock
 OUTDIR = $(HOME)/cmpt433/public/myApps
 CROSS_COMPILE = arm-linux-gnueabihf-
 CC_C = $(CROSS_COMPILE)gcc
-CFLAGS = -Wall -g -std=c99 -D _POSIX_C_SOURCE=200809L -Werror -pthread
-SRC = main.c alarm.c
+CFLAGS = -Wall -g -std=c99 -D _BSD_SOURCE -D _POSIX_C_SOURCE=200809L -Werror
+SRC = main.c alarm.c keypad.c deviceread.c utils.c
 
 LFLAGS = -L$(HOME)/cmpt433/public/asound_lib_BBB
 	

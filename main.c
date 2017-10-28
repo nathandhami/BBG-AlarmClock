@@ -1,4 +1,5 @@
 #include "alarm.h"
+#include "deviceread.h"
 
 _Bool threadDone = 0;
 
@@ -6,7 +7,6 @@ void getTime(){
 	time_t t;
 	time(&t);
 	printf("Current Time is %s", ctime(&t));
-	
 }
 
 void* timeThread(){
@@ -48,6 +48,8 @@ int main(int argc, char **argv){
 	if(pthread_create(&time_thread, NULL, timeThread, 0) != 0){
 		printf("Error creating time thread\n");
 	}
+
+	DeviceRead_startReading();
 
 	//Commands (We might not use this)
 	while(threadDone == 0){
@@ -115,6 +117,8 @@ int main(int argc, char **argv){
 	if(pthread_join(time_thread,NULL) != 0){
 		printf("Error joining time thread\n");
 	}
+
+	DeviceRead_stopReading();
 
 	return 0;
 }
