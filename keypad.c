@@ -40,11 +40,12 @@
 #define NUM_OF_COLS 4
 
 // Row 1, column 1 starts at the bottom right for the keypad hardware
+// Matrix rows start @ index 0 .. NUM_OF_ROWS-1 from the bottom
+// and matrix columns start from far right @ index 0 .. NUM_OF_COLS-1
 const static char keypadMap[NUM_OF_ROWS][NUM_OF_COLS] = { { 'D', '#', '0', '*' },
 										 	 	 	 	  { 'C', '9', '8', '7' },
 														  { 'B', '6', '5', '4' },
 														  { 'A', '3', '2', '1' }};
-
 
 void Keypad_init(void)
 {
@@ -62,23 +63,23 @@ void Keypad_init(void)
 	Utils_changePinDirection(GPIO_KEYPAD_COL1_FILEPATH_DIR, "out");
 	Utils_changePinDirection(GPIO_KEYPAD_COL2_FILEPATH_DIR, "out");
 	Utils_changePinDirection(GPIO_KEYPAD_COL3_FILEPATH_DIR, "out");
-	Utils_changePinDirection(GPIO_KEYPAD_COL3_FILEPATH_DIR, "out");
+	Utils_changePinDirection(GPIO_KEYPAD_COL4_FILEPATH_DIR, "out");
 }
 
-void Keypad_setColumnActive(eKEYPAD_ACTIVATE_COL col)
+void Keypad_setColumnActive(eKEYPAD_ACTIVATE_COL col, int value)
 {
 	switch (col){
 		case KEYPAD_ACTIVATE_COL1:
-			Utils_writeToOutputPin(GPIO_KEYPAD_COL1_FILEPATH_VAL, 1);
+			Utils_writeToOutputPin(GPIO_KEYPAD_COL1_FILEPATH_VAL, value);
 			break;
 		case KEYPAD_ACTIVATE_COL2:
-			Utils_writeToOutputPin(GPIO_KEYPAD_COL2_FILEPATH_VAL, 1);
+			Utils_writeToOutputPin(GPIO_KEYPAD_COL2_FILEPATH_VAL, value);
 			break;
 		case KEYPAD_ACTIVATE_COL3:
-			Utils_writeToOutputPin(GPIO_KEYPAD_COL3_FILEPATH_VAL, 1);
+			Utils_writeToOutputPin(GPIO_KEYPAD_COL3_FILEPATH_VAL, value);
 			break;
 		case KEYPAD_ACTIVATE_COL4:
-			Utils_writeToOutputPin(GPIO_KEYPAD_COL4_FILEPATH_VAL, 1);
+			Utils_writeToOutputPin(GPIO_KEYPAD_COL4_FILEPATH_VAL, value);
 			break;
 		default:
 			printf("Unable to set column active\n");

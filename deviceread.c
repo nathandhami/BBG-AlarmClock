@@ -17,6 +17,9 @@ static void *readingInputs(void *arg);
 
 static _Bool isReading = true;
 
+#define MICROSEC_PER_MILLISEC 1000
+#define DEBOUNCER_TIME MICROSEC_PER_MILLISEC * 400
+
 void DeviceRead_startReading(void)
 {
 	Keypad_init();
@@ -25,24 +28,56 @@ void DeviceRead_startReading(void)
 
 static void *readingInputs(void *arg)
 {
-	int sum = 0;
+	int currentColumn = KEYPAD_ACTIVATE_COL1;
 	while (isReading)
 	{
 //		// Algorithm for reading keypad inputs
 		// Set column i
 		// scan each row for column row
 		// i++
-		Keypad_setColumnActive(KEYPAD_ACTIVATE_COL1);
+
+		Keypad_setColumnActive(currentColumn, 1);
 		_Bool isRowActive = false;
 
-//		for (int i = 0; i < KEYPAD_READ_ROW_MAX; i++){
+//		printf("current column %d\n", currentColumn);
 
-			isRowActive = Keypad_readRow(KEYPAD_READ_ROW1);
-//		}
-		if (isRowActive == true){
-			sum++;
-			printf("user pressed %d: %c\n",sum, Keypad_keyPressed(KEYPAD_READ_ROW1, KEYPAD_ACTIVATE_COL1));
-			usleep(200000);
+		isRowActive = Keypad_readRow(KEYPAD_READ_ROW1);
+
+		if (isRowActive == true) {
+			printf("user pressed row %d, col %d: %c\n", KEYPAD_READ_ROW1, currentColumn,
+					Keypad_keyPressed(KEYPAD_READ_ROW1, currentColumn));
+			usleep(DEBOUNCER_TIME);
+		}
+
+		isRowActive = Keypad_readRow(KEYPAD_READ_ROW2);
+
+		if (isRowActive == true) {
+			printf("user pressed row %d, col %d: %c\n", KEYPAD_READ_ROW2,currentColumn,
+					Keypad_keyPressed(KEYPAD_READ_ROW2, currentColumn));
+			usleep(DEBOUNCER_TIME);
+		}
+		isRowActive = Keypad_readRow(KEYPAD_READ_ROW3);
+
+		if (isRowActive == true) {
+			printf("user pressed row %d, col %d: %c\n", KEYPAD_READ_ROW3, currentColumn,
+					Keypad_keyPressed(KEYPAD_READ_ROW3, currentColumn));
+			usleep(DEBOUNCER_TIME);
+		}
+		isRowActive = Keypad_readRow(KEYPAD_READ_ROW4);
+
+		if (isRowActive == true) {
+			printf("user pressed row %d, col %d: %c\n", KEYPAD_READ_ROW4, currentColumn,
+					Keypad_keyPressed(KEYPAD_READ_ROW4, currentColumn));
+			usleep(DEBOUNCER_TIME);
+		}
+
+		// deactivate current column
+		// set next column active
+		Keypad_setColumnActive(currentColumn, 0);
+		currentColumn = (currentColumn + 1) % (KEYPAD_ACTIVATE_COL_MAX);
+
+		if (currentColumn == KEYPAD_ACTIVATE_COL_MAX){
+			currentColumn = 0;
 		}
 	}
 

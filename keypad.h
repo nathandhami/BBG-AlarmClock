@@ -28,7 +28,7 @@ typedef enum {
 
 void Keypad_init(void);
 
-void Keypad_setColumnActive(eKEYPAD_ACTIVATE_COL col);
+void Keypad_setColumnActive(eKEYPAD_ACTIVATE_COL col, int value);
 
 _Bool Keypad_readRow(eKEYPAD_READ_ROW row);
 
