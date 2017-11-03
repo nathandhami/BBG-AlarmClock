@@ -27,7 +27,8 @@ block content
 		- for (let i = 0; i < alarms.length; i++) {
 			+alarm-item(alarms[i].time, alarms[i].level, alarms[i].identification, alarms[i])
 		- }
-		a.a-list.col-xs-4.form-group.add-icon
-			button.btn.btn-default.btn-circle-lg(href='#', data-toggle='modal', data-target='#timeModal')
-				i.glyphicon.glyphicon-plus
+		if (alarms.length < 12)
+			a.a-list.col-xs-4.form-group.add-icon
+				button.btn.btn-default.btn-circle-lg(href='#', data-toggle='modal', data-target='#timeModal')
+					i.glyphicon.glyphicon-plus
 	script(type='text/javascript', src='javascripts/index.js')

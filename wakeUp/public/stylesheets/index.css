@@ -6,7 +6,7 @@ html, body{
 }
 
 .clock-div {
-    height: 65%;
+    height: 60%;
     width: 100%;
 }
 
@@ -226,22 +226,22 @@ html, body{
     border-top-color: #3ba024;
 }
 
-.hard-level .btn-primary:hover {
+.hard-level .btn-primary:hover, .hard-level .btn-primary {
     background: transparent;
     border-color: #bc1c1c;
 }
 
-.medium-level .btn-primary:hover {
+.medium-level .btn-primary:hover, .medium-level .btn-primary {
     background: transparent;
     border-color: #e8cf19;
 }
 
-.easy-level .btn-primary:hover {
+.easy-level .btn-primary:hover, .easy-level .btn-primary {
     background: transparent;
     border-color: #3ba024;
 }
 
-.btn-primary, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
+.btn-primary:active, .btn-primary:visited, .btn-primary:focus {
     background: transparent;
     border-color: transparent;
     outline: none;

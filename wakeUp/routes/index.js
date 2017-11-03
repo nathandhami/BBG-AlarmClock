@@ -23,7 +23,6 @@ router.route('/alarm/set')
     var alarmTime = xssFilters.inHTMLData(req.body.time);
 
     var days = [];
-    var diff_level;
 
     days.push(xssFilters.inHTMLData(req.body.sunday));
     days.push(xssFilters.inHTMLData(req.body.monday));
@@ -33,21 +32,39 @@ router.route('/alarm/set')
     days.push(xssFilters.inHTMLData(req.body.friday));
     days.push(xssFilters.inHTMLData(req.body.saturday));
 
-    diff_level = xssFilters.inHTMLData(req.body.level);
+    var diff_level = xssFilters.inHTMLData(req.body.level);
+    var id = xssFilters.inHTMLData(req.body.existingId);
 
-    const alarm = new Alarm({
-      time: alarmTime,
-      days: days,
-      level: diff_level,
-    });
+    Alarm.findOne({'identification': id}).exec((err, alarm) => {
+      if (err) {
+        throw err;
+      } 
+      else if (alarm == null) {
+        const newAlarm = new Alarm({
+          time: alarmTime,
+          days: days,
+          level: diff_level,
+          statusOn: true,
+        });
 
-    alarm.save((err, posting) => {
-      if (err) throw err;
+        newAlarm.save((err, object) => {
+          if (err) throw err;
+        });
+      }
+      else {
+          alarm.time = alarmTime;
+          alarm.days = days;
+          alarm.level = diff_level;
+
+          alarm.save((err, object) => {
+            if (err) throw err;
+          });
+      }
+
+      res.redirect('/');
     });
 
 	// TODO: set alarm through C application
-
-    res.redirect('/');
   });
 
 
@@ -61,8 +78,9 @@ router.route('/alarm/delete')
         throw err;
       } else {
           alarm.remove();
-          res.redirect('/');
       }
+
+      res.redirect('/');
     });
 
   });

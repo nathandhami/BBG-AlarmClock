@@ -23,6 +23,7 @@ $(document).ready( function() {
     $('#timeModal').modal('show');
     var aInfo = JSON.parse($(a.target).children('input').val());
 
+    $('#existingID').val(aInfo.identification);
     $('.timepicker1').val(aInfo.time);
     if (aInfo.level == "easy") {
         $('#radio1').click();
@@ -44,15 +45,15 @@ $(document).ready( function() {
   //clear modal on modal hide
   $('#timeModal').on('hidden.bs.modal', function () {
       var date = new Date();
+      $('#existingID').val(-1);
       $('.timepicker1').val(moment(date).format('h:mm A'));
+
       for (var i = 0; i < 7; i++) {
-      var id = i + 1;
-
-      if ($('#day' + id).is(':checked')) {
-        $('#day' + id).click();
-      }
-
-      $('#radio1').click();
+        var id = i + 1;
+        if ($('#day' + id).is(':checked')) {
+          $('#day' + id).click();
+        }
+        $('#radio1').click();
     }
   });
 
