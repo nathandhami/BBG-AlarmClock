@@ -12,7 +12,7 @@ CROSS_TOOL = arm-linux-gnueabihf-
 CC_CPP = $(CROSS_TOOL)g++
 CC_C = $(CROSS_TOOL)gcc
 
-CFLAGS = -Wall -g -D _POSIX_C_SOURCE=200809L
+CFLAGS = -Wall -g -D _POSIX_C_SOURCE=200809L -std=c++11
 
 # -pg for supporting gprof profiling.
 #CFLAGS += -pg
