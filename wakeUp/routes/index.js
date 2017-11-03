@@ -85,4 +85,27 @@ router.route('/alarm/delete')
 
   });
 
+router.route('/alarm/status')
+  .post((req, res, next) => {
+    var id = xssFilters.inHTMLData(req.body.alarmId);
+    var status = xssFilters.inHTMLData(req.body.status);
+
+    Alarm.findOne({'identification': id}).exec((err, alarm) => {
+      if (err || alarm == null) {
+        throw err;
+      } else {
+          if (status == "true") {
+            alarm.statusOn = true;
+          } else if (status == "false") {
+            alarm.statusOn = false;
+          }
+
+          alarm.save((err, object) => {
+            if (err) throw err;
+          });
+      }
+    });
+
+  });
+
 module.exports = router;

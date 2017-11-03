@@ -57,5 +57,17 @@ $(document).ready( function() {
     }
   });
 
+  //change status
+  $(".alarm-status").on('change', function(e) {
+    $.ajax({
+        type: "POST",
+        url: "/alarm/status",
+        data: { 
+            alarmId: $(this).val(),
+            status: $(this).prop('checked'),
+        }
+    });
+});
+
 });
 
