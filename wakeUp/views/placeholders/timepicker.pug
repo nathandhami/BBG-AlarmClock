@@ -17,7 +17,7 @@
               input.timepicker1.form-control.input-small(type="text", name="time")
               span.input-group-addon
                 i.glyphicon.glyphicon-time
-          .form-group.btn-group.col-sm-6.weekdays(data-toggle="buttons")
+          .form-group.btn-group.col-sm-7.weekdays(data-toggle="buttons")
             label.btn.btn-default.btn-circle
               input#day1(type="checkbox", name="sunday", autocomplete="off")
               |  S
@@ -40,13 +40,13 @@
               input#day7(type="checkbox", name="saturday", autocomplete="off")
               |  S
           .form-group.btn-group.col-sm-12.difficulty-level(data-toggle="buttons")
-            label.btn.btn-info.active
+            label.btn.btn-default.active
               input#radio1(type="radio", name="level", autocomplete="off", checked, value="easy")
               |  Easy
-            label.btn.btn-info
+            label.btn.btn-default
               input#radio2(type="radio", name="level", autocomplete="off", value="medium")
               |  Medium
-            label.btn.btn-info
+            label.btn.btn-default
               input#radio3(type="radio", name="level", autocomplete="off", value="hard")
               |  Hard
           .form-group

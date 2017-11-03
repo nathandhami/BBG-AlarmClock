@@ -226,22 +226,22 @@ html, body{
     border-top-color: #3ba024;
 }
 
-.hard-level .btn-primary:hover, .hard-level .btn-primary {
+.hard-level .btn-primary:hover{
     background: transparent;
     border-color: #bc1c1c;
 }
 
-.medium-level .btn-primary:hover, .medium-level .btn-primary {
+.medium-level .btn-primary:hover{
     background: transparent;
     border-color: #e8cf19;
 }
 
-.easy-level .btn-primary:hover, .easy-level .btn-primary {
+.easy-level .btn-primary:hover{
     background: transparent;
     border-color: #3ba024;
 }
 
-.btn-primary:active, .btn-primary:visited, .btn-primary:focus {
+.btn-primary, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
     background: transparent;
     border-color: transparent;
     outline: none;
@@ -318,8 +318,19 @@ input:checked + .slider:before {
     padding: 6px 0;
     font-size: 12px;
     line-height: 1.428571429;
-    border-radius: 15px;
+    border-radius: 15px !important;
     border: none;
+    outline: none !important;
+    margin-right: 0.5em;
+}
+
+.btn-circle:focus, .btn-circle:active, .btn-circle:hover {
+    outline: none !important;
+    background: #ffe4c4 !important;
+}
+
+.btn-circle.active, .btn-circle.focus {
+    background: #ffe4c4 !important;
 }
 
 .btn-circle-lg {
@@ -331,12 +342,15 @@ input:checked + .slider:before {
     line-height: 1.33;
     border-radius: 25px;
     border-color: #bc5151;
-    color: white;
+    color: burlywood;
     background-color: #bc5151;
+    outline: none !important;
 }
 
-.btn-circle-lg:active, .btn-circle-lg:visited, .btn-circle-lg:focus {
+.btn-circle-lg:focus, .btn-circle-lg:active {
     background-color: #bc5151;
+    border-color: #bc5151;
+    color: burlywood;
 }
 
 .btn-circle-lg:hover {
@@ -356,6 +370,25 @@ input:checked + .slider:before {
 
 .difficulty-level {
     margin-top: 10px;
+}
+
+.difficulty-level label {
+    outline: none !important;
+}
+
+.difficulty-level label:nth-child(1).active {
+    color: #eee;
+    background: #1f913c;
+}
+
+.difficulty-level label:nth-child(2).active {
+    color: #3f380a;
+    background: #dbc21a;
+}
+
+.difficulty-level label:nth-child(3).active {
+    color: #eee;
+    background: #c14b4b;
 }
 
 .time-select {
