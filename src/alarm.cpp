@@ -1,4 +1,11 @@
 #include "alarm.h"
+#include "utils.h"
+#include "LiquidCrystal_I2C.h"
+#include <stdio.h>
+#include <ctime>
+#include <chrono>
+#include <iostream>
+#include <pthread.h>
 
 // beep-06 wave file are taken from "https://www.soundjay.com/beep-sounds-1.html"
 #define SOURCE_FILE "wave-files/beep-06.wav"
@@ -8,6 +15,14 @@
 #define SAMPLE_RATE   44100
 #define NUM_CHANNELS  1
 #define SAMPLE_SIZE   (sizeof(short))
+#define ALARM_SIZE 20
+using namespace std;
+
+pthread_t alarm_thread;
+pthread_t display_time_thread;
+int size;
+int today;
+Alarm_t alarm_clock[ALARM_SIZE];
 
 // Store data of a single wave file read into memory.
 // Space is dynamically allocated; must be freed correctly!
@@ -20,8 +35,8 @@ typedef struct {
 snd_pcm_t *Audio_openDevice();
 void Audio_readWaveFileIntoMemory(char *fileName, wavedata_t *pWaveStruct);
 void Audio_playFile(snd_pcm_t *handle, wavedata_t *pWaveData);
-
-//Write value to file
+void* displayTimeThread(void*);
+void* alarmThread(void*);
 void writeToFile(char *fileName, char* value);
 
 void waitDelay(long sec, long nanoSec){
@@ -33,12 +48,25 @@ void waitDelay(long sec, long nanoSec){
 
 
 void startProgram(){
+	setenv("TZ", "PST8PST", 1);   // set TZ
+	tzset();
+
 	//opening upjoystick file to stop alarm (temporary)
 	writeToFile(EXPORTFILE,"26");
 	//size of the alarm
 	size = 0;
 	//today's date
 	today = 0;
+
+	int thread1 = pthread_create(&alarm_thread, NULL, alarmThread, (void *)0);
+	if(thread1 != 0){
+		printf("Error creating time thread\n");
+	}
+
+	int thread2 = pthread_create(&display_time_thread, NULL, displayTimeThread, (void *)1);
+	if(thread2 != 0){
+		printf("Error creating time thread\n");
+	}
 }
 
 //check if the alarm has to rang or not
@@ -63,7 +91,7 @@ void resetAlarmBeep(int day){
 
 //alarm sound (mostly from Brian's wave_player.c code)
 //alarm sound still not good enough, most probably using thread to play the audio file.
-void beep(_Bool* beep){
+void beep(bool* beep){
 	// Configure Output Device
 	snd_pcm_t *handle = Audio_openDevice();
 
@@ -199,7 +227,7 @@ void Audio_readWaveFileIntoMemory(char *fileName, wavedata_t *pWaveStruct)
 	pWaveStruct->numSamples = sizeInBytes / SAMPLE_SIZE;
 
 	// Allocate Space
-	pWaveStruct->pData = malloc(sizeInBytes);
+	pWaveStruct->pData = (short int*)malloc(sizeInBytes);
 	if (pWaveStruct->pData == NULL) {
 		fprintf(stderr, "ERROR: Unable to allocate %d bytes for file %s.\n",
 				sizeInBytes, fileName);
@@ -245,4 +273,67 @@ void writeToFile(char *fileName, char* value){
 	}
 	fprintf(file, "%s", value);
 	fclose(file);
+}
+
+void* alarmThread(void*) {
+	bool initialize_today = false;
+	while(true) {
+		auto now = std::chrono::system_clock::now();
+		time_t t = chrono::system_clock::to_time_t(now);
+		tm local_tm = *localtime(&t);
+		int hour = local_tm.tm_hour;
+		int day = local_tm.tm_wday;
+		int minute = local_tm.tm_min;
+		int second = local_tm.tm_sec;
+		if(initialize_today == false){
+			today = day;
+			initialize_today = true;
+		}
+		checkAlarm(hour, minute);
+		resetAlarmBeep(day);
+		waitDelay(1, 0);
+	}
+
+}
+
+void* displayTimeThread(void*){
+	//set virtual cape
+	Utils_loadVirtualCape("BB-I2C1");
+	// i2c address
+	uint8_t i2c=0x3f;
+	// Control line PINs
+	uint8_t en=2;
+	uint8_t rw=1;
+	uint8_t rs=0;
+	// Data line PINs
+	uint8_t d4=4;
+	uint8_t d5=5;
+	uint8_t d6=6;
+	uint8_t d7=7;
+	// Backlight PIN
+	uint8_t bl=3;
+	// LCD display size
+	uint8_t rows=2;
+	uint8_t cols=16;
+
+	LiquidCrystal_I2C lcd("/dev/i2c-1", i2c, en, rw, rs, d4, d5, d6, d7, bl, POSITIVE);
+
+	lcd.begin(cols, rows);
+	lcd.on();
+	lcd.clear();
+
+	while(true) {
+		lcd.clear();
+		auto now = std::chrono::system_clock::now();
+		time_t t = chrono::system_clock::to_time_t(now);
+		tm local_tm = *localtime(&t);
+		int hour = local_tm.tm_hour; 
+		int minute = local_tm.tm_min;
+		int second = local_tm.tm_sec;
+		char buffer[16];
+		sprintf (buffer, "%d:%d:%d", hour, minute, second);
+		printf("%s\n", buffer);
+		lcd.print(buffer);
+		waitDelay(1, 0);
+	}
 }

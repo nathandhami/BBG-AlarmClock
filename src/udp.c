@@ -8,7 +8,7 @@
 #include <unistd.h>			// for close()
 #include <pthread.h>
 #include "udp.h"
-#include "sorter.h"
+#include "alarm.h"
 
 #define MSG_MAX_LEN 4096 * 3
 #define PORT		12345
@@ -23,7 +23,7 @@ static void *server(void *args);
 static pthread_t id;
 static int socketDescriptor;
 static _Bool stopProgram = false;
-static int * array;
+
 
 void UDP_startServer(void)
 {
@@ -32,9 +32,6 @@ void UDP_startServer(void)
 
 void UDP_stopServer(void)
 {
-	if(array != NULL) {
-		free(array);
-	}
 	close(socketDescriptor);
 	pthread_join(id, NULL);
 }
@@ -56,42 +53,20 @@ void *server(void *args)
 		unsigned int sin_len = sizeof(sin);
 		int bytesRx = recvfrom(socketDescriptor, message, MSG_MAX_LEN, 0, (struct sockaddr *) &sin, &sin_len);
 		message[bytesRx] = 0;
-		bool dataNotSent = true;
 		char* token = strtok(message, " ");
 		if((strcmp(message, "help\n") == 0) || (strcmp(message, "help") == 0)) {
 			strcpy(message, "Accepted command examples:\ncount -- display number arrays sorted.\nget length -- display length of array currently being sorted.\nget array -- display the full array being sorted.\nget 10 -- display the tenth element of array currently being sorted.\nstop -- cause the server program to end.\n");
 
-		} else if(strcmp(token, "count\n") == 0) {
-			long long count = Sorter_getNumberArraysSorted();
-			//use of snprint() learnt from user jfs @ https://stackoverflow.com/questions/2709713/how-to-convert-unsigned-long-to-string
-			const int n = snprintf(NULL, 0, "%llu", count);
-			if (n < MSG_MAX_LEN ) {
-				snprintf(message, MSG_MAX_LEN, "%llu\n", count);
-			} else {
-				strcpy(message, "Count larger than max message size.");
-			}
-
-		} else if((strcmp(token, "get\n") == 0) || (strcmp(token, "get") == 0)) {
-			token = strtok(NULL, " ");
+		} else if(strcmp(token, "add") == 0) {
+			char* token1 = strtok(NULL, " ");
+			char* token2 = strtok(NULL, " ");
+			char* pEnd;
+			int base = 10;
+			int hour = strtol (token1,&pEnd,base);
+			int minute = strtol (token2,&pEnd,base);
 			message[0] = '\0';
-			if(token == NULL) {
-				strcpy(message, "get requires a second argument\n");
-			} else if (strcmp(token, "length\n") == 0) {
-				snprintf(message, MSG_MAX_LEN, "%d\n", Sorter_getArrayLength());
-
-			} else if (strcmp(token, "array\n") == 0) {
-
-			} else {
-				char * pEnd;
-				int base = 10;
-				long int enteredNum = strtol (token,&pEnd,base);
-				int value = Sorter_getArrayDataAt(enteredNum);
-				if(value == -1) {
-					snprintf(message, MSG_MAX_LEN, "Please enter number between 1 and %d\n", Sorter_getArrayLength());
-				} else {
-					snprintf(message, MSG_MAX_LEN, "%d\n", value);
-				}
-			}
+			printf("hour: %d    minute:%d\n", hour, minute);
+			addAlarm(hour, minute);
 
 		} else if(strcmp(token, "stop\n") == 0) {
 			stopProgram = true;
