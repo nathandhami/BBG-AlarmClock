@@ -5,7 +5,7 @@
  ** Copyright 2014 - Under creative commons license 3.0 Attribution-ShareAlike CC BY-SA
  **/
 extern "C" {
-#include "alarm.h"
+	#include "alarm.h"
 }
 
 #include "LiquidCrystal_I2C.h"
@@ -41,19 +41,17 @@ int main (int argc, char *argv []) {
 	uint8_t en=2;
 	uint8_t rw=1;
 	uint8_t rs=0;
-
 	// Data line PINs
 	uint8_t d4=4;
 	uint8_t d5=5;
 	uint8_t d6=6;
 	uint8_t d7=7;
-
 	// Backlight PIN
 	uint8_t bl=3;
-
 	// LCD display size
 	uint8_t rows=2;
 	uint8_t cols=16;
+	startProgram();
 
 	LiquidCrystal_I2C lcd("/dev/i2c-1", i2c, en, rw, rs, d4, d5, d6, d7, bl, POSITIVE);
 
@@ -72,6 +70,7 @@ int main (int argc, char *argv []) {
 	bool initialize_today = false;
 
 	while(true) {
+
 		lcd.clear();
 
 		auto now = std::chrono::system_clock::now();
@@ -81,8 +80,17 @@ int main (int argc, char *argv []) {
 		// if(hour == 0) {
 		// 	hour = 12;
 		// }
+		int day = local_tm.tm_wday;
 		int minute = local_tm.tm_min;
 		int second = local_tm.tm_sec;
+		if(initialize_today == false){
+			today = day;
+			initialize_today = true;
+		}
+		checkAlarm(hour, minute);
+		resetAlarmBeep(day);
+
+
 		char buffer[16];
 		sprintf (buffer, "%d:%d:%d", hour, minute, second);
 		printf("%s\n", buffer);
@@ -143,34 +151,3 @@ int main (int argc, char *argv []) {
 	// sleep(1);
 	// lcd.clear();
 }
-
-// void* timeThread(){
-// 	_Bool initialize_today = false;
-// 	while(threadDone == 0){
-// 		time_t t;
-// 		time(&t);
-// 		char* temp_str = ctime(&t);
-// 		char* hour = (char*) malloc(sizeof(char)*3);
-// 		hour[0] = temp_str[11];
-// 		hour[1] = temp_str[12];
-// 		hour[2] = '\0';
-// 		char* minute = (char*) malloc(sizeof(char)*3);
-// 		minute[0] = temp_str[14];
-// 		minute[1] = temp_str[15];
-// 		minute[2] = '\0';
-// 		char* day = (char*) malloc(sizeof(char)*3);
-// 		day[0] = temp_str[8];
-// 		day[1] = temp_str[9];
-// 		day[2] = '\0';
-// 		if(initialize_today == false){
-// 			today = atoi(day);
-// 			initialize_today = true;
-// 		}
-// 		checkAlarm(atoi(hour),atoi(minute));
-// 		resetAlarmBeep(atoi(day));
-// 		free(hour);
-// 		free(minute);
-// 		free(day);
-// 	}
-// 	return NULL;
-// }
