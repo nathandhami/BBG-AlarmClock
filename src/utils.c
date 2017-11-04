@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #define EXPORT_FILE "/sys/class/gpio/export"
+#define CAPE_MANAGER_FILE "/sys/devices/platform/bone_capemgr/slots"
 
 #define MAX_BUFFER_SIZE 1024
 
@@ -26,7 +27,7 @@ void Utils_writeToExportFile(int pinNumber)
 	fclose(pFile);
 }
 
-void Utils_changePinDirection(char *gpioFileName, char *dir)
+void Utils_changePinDirection(const char *gpioFileName, const char *dir)
 {
 	FILE *pFile = fopen(gpioFileName, "w");
 	if (pFile == NULL){
@@ -38,7 +39,7 @@ void Utils_changePinDirection(char *gpioFileName, char *dir)
 	fclose(pFile);
 }
 
-void Utils_writeToOutputPin(char *gpioFileName, int value)
+void Utils_writeToOutputPin(const char *gpioFileName, int value)
 {
 	FILE *pFile = fopen(gpioFileName, "w");
 
@@ -51,7 +52,7 @@ void Utils_writeToOutputPin(char *gpioFileName, int value)
 	fclose(pFile);
 }
 
-_Bool Utils_readInputPin(char *gpioFileName)
+_Bool Utils_readInputPin(const char *gpioFileName)
 {
 	FILE *pFile = fopen(gpioFileName, "r");
 	if (pFile == NULL){
@@ -69,3 +70,19 @@ _Bool Utils_readInputPin(char *gpioFileName)
 
 	return val == 1 ? true:false;
 }
+
+void Utils_loadVirtualCape(const char *capeFileName)
+{
+	FILE *virtualCapeFile = fopen(CAPE_MANAGER_FILE, "w");
+	if (virtualCapeFile == NULL) {
+		printf("ERROR: cannot open virtual cape %s.\n", CAPE_MANAGER_FILE);
+	}
+
+	int charWritten = fprintf(virtualCapeFile, "%s", capeFileName);
+	if (charWritten <= 0) {
+		printf("ERROR: cannot write to virtual cape\n");
+	}
+
+	fclose(virtualCapeFile);
+}
+

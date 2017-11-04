@@ -5,13 +5,13 @@
  ** Copyright 2014 - Under creative commons license 3.0 Attribution-ShareAlike CC BY-SA
  **/
 #include "LiquidCrystal_I2C.h"
+#include "utils.h"
 #include <stdio.h>
 #include <ctime>
 #include <chrono>
 #include <iostream>
 using namespace std;
 #define VIRTUAL_CAPE_FILE "/sys/devices/platform/bone_capemgr/slots"
-
 
 
 void* timeThread(void);
@@ -21,15 +21,7 @@ bool threadDone = 0;
 int main (int argc, char *argv []) {
 
 	//set virtual cape
-	FILE *virtualCapeFile = fopen(VIRTUAL_CAPE_FILE, "w");
-	if (virtualCapeFile == NULL) {
-		printf("ERROR OPENING %s.", VIRTUAL_CAPE_FILE);
-	}
-	int charWritten = fprintf(virtualCapeFile, "BB-I2C1");
-	if (charWritten <= 0) {
-		printf("ERROR WRITING DATA");
-	}
-	fclose(virtualCapeFile);
+	Utils_loadVirtualCape("BB-I2C1");
 
 	// i2c address
 	uint8_t i2c=0x3f;

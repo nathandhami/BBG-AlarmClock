@@ -11,10 +11,12 @@
 
 #include <stdbool.h>
 
+extern "C"{
 void Utils_writeToExportFile(int pinNumber);
-void Utils_changePinDirection(char *gpioFileName, char *dir);
-void Utils_writeToOutputPin(char *gpioFileName, int value);
-_Bool Utils_readInputPin(char *gpioFileName);
+void Utils_changePinDirection(const char *gpioFileName, const char *dir);
+void Utils_writeToOutputPin(const char *gpioFileName, int value);
+_Bool Utils_readInputPin(const char *gpioFileName);
+void Utils_loadVirtualCape(const char *capeFileName);
 
-
+}
 #endif /* UTILS_H_ */
