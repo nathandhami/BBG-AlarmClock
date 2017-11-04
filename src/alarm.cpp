@@ -1,11 +1,14 @@
 #include "alarm.h"
-#include "utils.h"
 #include "LiquidCrystal_I2C.h"
 #include <stdio.h>
 #include <ctime>
 #include <chrono>
 #include <iostream>
 #include <pthread.h>
+extern "C" {
+	#include "deviceread.h"
+	#include "utils.h"
+}
 
 // beep-06 wave file are taken from "https://www.soundjay.com/beep-sounds-1.html"
 #define SOURCE_FILE "wave-files/beep-06.wav"
@@ -50,7 +53,7 @@ void waitDelay(long sec, long nanoSec){
 void startProgram(){
 	setenv("TZ", "PST8PST", 1);   // set TZ
 	tzset();
-
+	DeviceRead_startReading();
 	//opening upjoystick file to stop alarm (temporary)
 	writeToFile(EXPORTFILE,"26");
 	//size of the alarm
@@ -332,7 +335,7 @@ void* displayTimeThread(void*){
 		int second = local_tm.tm_sec;
 		char buffer[16];
 		sprintf (buffer, "%d:%d:%d", hour, minute, second);
-		printf("%s\n", buffer);
+		// printf("%s\n", buffer);
 		lcd.print(buffer);
 		waitDelay(1, 0);
 	}

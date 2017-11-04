@@ -1,6 +1,4 @@
-extern "C" {
-	#include "udp.h"
-}
+#include "udp.h"
 #include "alarm.h"
 
 int main (int argc, char *argv []) {

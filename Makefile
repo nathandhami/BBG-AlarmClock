@@ -5,7 +5,7 @@
 TARGET= lcd
 SRC_DIR= src/
 SOURCES= $(SRC_DIR)main.cpp $(SRC_DIR)I2CIO.cpp $(SRC_DIR)LCD.cpp $(SRC_DIR)LiquidCrystal_I2C.cpp \
-	   	 $(SRC_DIR)i2c-dev.h $(SRC_DIR)utils.c $(SRC_DIR)alarm.cpp
+	   	 $(SRC_DIR)i2c-dev.h $(SRC_DIR)alarm.cpp $(SRC_DIR)udp.cpp
 
 LFLAGS = -Llib -lpthread
 IFLAGS = -Iincludes
@@ -27,8 +27,10 @@ wave:
 	cp wave-files/* $(OUTDIR)/wave-files/ 
 
 lcd:
-	$(CC_C) $(CFLAGS) $(LFLAGS) $(IFLAGS) -o udp.o $(SRC_DIR)udp.c -lpthread
-	$(CC_CPP) $(CPPFLAGS) $(IFLAGS) $(SOURCES) alarm.o udp.o -o $(OUTDIR)/$(TARGET)  $(LFLAGS) -lasound  -lpthread
+	$(CC_C) $(CFLAGS) $(LFLAGS) $(IFLAGS) -o utils.o $(SRC_DIR)utils.c -lpthread
+	$(CC_C) $(CFLAGS) $(LFLAGS) $(IFLAGS) -o reader.o $(SRC_DIR)deviceread.c -lpthread
+	$(CC_C) $(CFLAGS) $(LFLAGS) $(IFLAGS) -o keypad.o $(SRC_DIR)keypad.c -lpthread
+	$(CC_CPP) $(CPPFLAGS) $(IFLAGS) $(SOURCES) utils.o keypad.o reader.o -o $(OUTDIR)/$(TARGET)  $(LFLAGS) -lasound  -lpthread
 			
 nodeserver:  
 

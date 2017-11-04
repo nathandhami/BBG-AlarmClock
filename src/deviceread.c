@@ -4,7 +4,7 @@
  *  Created on: Oct 27, 2017
  *      Author: ndhami
  */
-
+#define _BSD_SOURCE
 #include <stdio.h>
 #include <stdbool.h>
 #include <pthread.h>
