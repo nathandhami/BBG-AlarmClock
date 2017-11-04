@@ -3,4 +3,8 @@
 .project
 .cproject
 
+# Node Modules
+wakeUp/node_modules
+
 # Misc files
+*.o
