@@ -7,6 +7,8 @@ GPIO_80 --> pin 6 Row 2
 GPIO_81 --> pin 7 Row 3
 GPIO_11 --> pin 8 Row 4
 
+header p8
+
 col pins are output
 row pins are input
 

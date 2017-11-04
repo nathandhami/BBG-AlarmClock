@@ -5,7 +5,7 @@
 TARGET= lcd
 SRC_DIR= src/
 SOURCES= $(SRC_DIR)main.cpp $(SRC_DIR)I2CIO.cpp $(SRC_DIR)LCD.cpp $(SRC_DIR)LiquidCrystal_I2C.cpp \
-	   	 $(SRC_DIR)i2c-dev.h
+	   	 $(SRC_DIR)i2c-dev.h $(SRC_DIR)utils.c
 
 LFLAGS = -Llib -lpthread
 IFLAGS = -Iincludes
