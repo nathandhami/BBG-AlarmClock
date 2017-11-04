@@ -7,3 +7,4 @@
 wakeUp/node_modules
 
 # Misc files
+*.o
