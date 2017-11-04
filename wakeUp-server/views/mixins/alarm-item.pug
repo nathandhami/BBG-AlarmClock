@@ -1,0 +1,43 @@
+mixin alarm-item(time, level, alarmId, status, alarmObject)
+	if (level == "easy")
+		a.a-list.col-xs-4.form-group.easy-level
+			.half-border
+			button.btn.btn-primary.btn-lg.time-button.hvr-push #{time}
+				input.alarmInfo(type="hidden", value=alarmObject)
+			label.switch
+				if (status) 
+					input.alarm-status(type="checkbox", value=alarmId, checked)
+				else
+					input.alarm-status(type="checkbox", value=alarmId)
+				span.slider.round
+			form#delForm(action="/alarm/delete", method="post")
+				button.hide-close-button(type="submit", name="alarmId", value=alarmId)
+					i.glyphicon.glyphicon-remove
+	else if (level == "medium")
+		a.a-list.col-xs-4.form-group.medium-level
+			.half-border
+			button.btn.btn-primary.btn-lg.time-button.hvr-push #{time}
+				input.alarmInfo(type="hidden", value=alarmObject)
+			label.switch
+				if (status) 
+					input.alarm-status(type="checkbox", value=alarmId, checked)
+				else
+					input.alarm-status(type="checkbox", value=alarmId)
+				span.slider.round
+			form#delForm(action="/alarm/delete", method="post")
+				button.hide-close-button(type="submit", name="alarmId", value=alarmId)
+					i.glyphicon.glyphicon-remove
+	else
+		a.a-list.col-xs-4.form-group.hard-level
+			.half-border
+			button.btn.btn-primary.btn-lg.time-button.hvr-push #{time}
+				input.alarmInfo(type="hidden", value=alarmObject)
+			label.switch
+				if (status) 
+					input.alarm-status(type="checkbox", value=alarmId, checked)
+				else
+					input.alarm-status(type="checkbox", value=alarmId)
+				span.slider.round
+			form#delForm(action="/alarm/delete", method="post")
+				button.hide-close-button(type="submit", name="alarmId", value=alarmId)
+					i.glyphicon.glyphicon-remove
