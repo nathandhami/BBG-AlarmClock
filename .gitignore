@@ -2,5 +2,6 @@
 *.settings
 .project
 .cproject
+*.o
 
 # Misc files

@@ -4,6 +4,10 @@
  ** Author: Kaj-Michael Lang <milang@tal.org>
  ** Copyright 2014 - Under creative commons license 3.0 Attribution-ShareAlike CC BY-SA
  **/
+extern "C" {
+#include "alarm.h"
+}
+
 #include "LiquidCrystal_I2C.h"
 #include <stdio.h>
 #include <ctime>
@@ -62,16 +66,21 @@ int main (int argc, char *argv []) {
 	waitLong.tv_nsec = 0;
 	waitLong.tv_sec = 1;
 
+	setenv("TZ", "PST8PST", 1);   // set TZ
+	tzset();
+
+	bool initialize_today = false;
+
 	while(true) {
 		lcd.clear();
 
 		auto now = std::chrono::system_clock::now();
 		time_t t = chrono::system_clock::to_time_t(now);
-		tm local_tm = *gmtime(&t);
-		int hour = (local_tm.tm_hour - 7) % 12;
-		if(hour == 0) {
-			hour = 12;
-		}
+		tm local_tm = *localtime(&t);
+		int hour = local_tm.tm_hour; //- 7) % 12;
+		// if(hour == 0) {
+		// 	hour = 12;
+		// }
 		int minute = local_tm.tm_min;
 		int second = local_tm.tm_sec;
 		char buffer[16];
