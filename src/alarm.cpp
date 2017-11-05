@@ -27,6 +27,26 @@ int size;
 int today;
 Alarm_t alarm_clock[ALARM_SIZE];
 
+const char * months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+const char * days[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+// i2c address
+uint8_t i2c=0x3f;
+// Control line PINs
+uint8_t en=2;
+uint8_t rw=1;
+uint8_t rs=0;
+// Data line PINs
+uint8_t d4=4;
+uint8_t d5=5;
+uint8_t d6=6;
+uint8_t d7=7;
+// Backlight PIN
+uint8_t bl=3;
+// LCD display size
+uint8_t rows=2;
+uint8_t cols=16;
+LiquidCrystal_I2C lcd("/dev/i2c-1", i2c, en, rw, rs, d4, d5, d6, d7, bl, POSITIVE);
+
 // Store data of a single wave file read into memory.
 // Space is dynamically allocated; must be freed correctly!
 typedef struct {
@@ -287,7 +307,6 @@ void* alarmThread(void*) {
 		int hour = local_tm.tm_hour;
 		int day = local_tm.tm_wday;
 		int minute = local_tm.tm_min;
-		int second = local_tm.tm_sec;
 		if(initialize_today == false){
 			today = day;
 			initialize_today = true;
@@ -302,24 +321,6 @@ void* alarmThread(void*) {
 void* displayTimeThread(void*){
 	//set virtual cape
 	Utils_loadVirtualCape("BB-I2C1");
-	// i2c address
-	uint8_t i2c=0x3f;
-	// Control line PINs
-	uint8_t en=2;
-	uint8_t rw=1;
-	uint8_t rs=0;
-	// Data line PINs
-	uint8_t d4=4;
-	uint8_t d5=5;
-	uint8_t d6=6;
-	uint8_t d7=7;
-	// Backlight PIN
-	uint8_t bl=3;
-	// LCD display size
-	uint8_t rows=2;
-	uint8_t cols=16;
-
-	LiquidCrystal_I2C lcd("/dev/i2c-1", i2c, en, rw, rs, d4, d5, d6, d7, bl, POSITIVE);
 
 	lcd.begin(cols, rows);
 	lcd.on();
@@ -333,10 +334,18 @@ void* displayTimeThread(void*){
 		int hour = local_tm.tm_hour; 
 		int minute = local_tm.tm_min;
 		int second = local_tm.tm_sec;
+		int weekDay = local_tm.tm_wday;
+		int monthDay = local_tm.tm_mday;
+		int month = local_tm.tm_mon;
+		int year = local_tm.tm_year;
 		char buffer[16];
+		char buffer2[16];
 		sprintf (buffer, "%d:%d:%d", hour, minute, second);
+		sprintf (buffer2, "%s %s %d %d", days[weekDay], months[month], monthDay, (year + 1900));
 		// printf("%s\n", buffer);
 		lcd.print(buffer);
+		lcd.setCursor(0, 1);
+		lcd.print(buffer2);
 		waitDelay(1, 0);
 	}
 }
