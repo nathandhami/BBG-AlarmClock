@@ -1,92 +1,130 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include <unistd.h>
+
+#include "udp.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <netdb.h>
 #include <string.h>			// for strncmp()
 #include <unistd.h>			// for close()
 #include <pthread.h>
-#include "udp.h"
-#include "alarm.h"
+#include <stdbool.h>
 
-#define MSG_MAX_LEN 4096 * 3
-#define PORT		12345
+#define UDP_PORT 12345
+#define MAX_RECEIVE_MESSAGE_LENGTH 1024
+#define REPLY_BUFFER_SIZE (1500)
+#define VALUES_PER_LINE 4
 
-void UDP_startServer(void);
-void UDP_stopServer(void);
-_Bool UDP_checkStop(void);
-
-
-static void *server(void *args);
-
-static pthread_t id;
-static int socketDescriptor;
-static _Bool stopProgram = false;
+// THESE ARE THE IDS FOR NODEJS PACKETS.
+// SETTER COMMANDS
+#define COMMAND_TEST        "test"
 
 
-void UDP_startServer(void)
+// This macro will retrieve the data from the UDP packet
+// The data being sent from webserver is assumed to be in this format: command:(Value)
+#define RETRIEVE_PACKET_DATA(buffer) strchr((buffer), ':') + 1
+
+static pthread_t s_threadId;
+static char replyBuffer[REPLY_BUFFER_SIZE];
+static _Bool continueUdpServer = true;
+
+// Header
+static void *udpListeningThread(void *args);
+static void processUDPCommand(char* udpCommand, int socketDescriptor, struct sockaddr_in *pSin);
+static int secondWordToInt(char *string);
+static void concatValuesToString(char *targetBuffer, int data[], int indexStart, int indexEnd);
+static char *extractPacketData(char *buffer);
+
+void UdpListener_startListening(void)
 {
-	pthread_create(&id, NULL, &server, NULL);
+	printf("Starting UDP server...\n");
+	pthread_create(&s_threadId, NULL, &udpListeningThread, NULL);
 }
 
-void UDP_stopServer(void)
+void UdpListener_cleanup(void)
 {
-	close(socketDescriptor);
-	pthread_join(id, NULL);
+	continueUdpServer = false;
+	pthread_join(s_threadId, NULL);
 }
 
-void *server(void *args)
-{	
+
+
+static void *udpListeningThread(void *args)
+{
+	// Buffer to hold packet data:
+	char message[MAX_RECEIVE_MESSAGE_LENGTH];
+
+	// Address
 	struct sockaddr_in sin;
+	unsigned int sin_len;						// May change.
 	memset(&sin, 0, sizeof(sin));
-	sin.sin_family = AF_INET;                   // Connection may be from network
-	sin.sin_addr.s_addr = htonl(INADDR_ANY);    // Host to Network long
-	sin.sin_port = htons(PORT);                 // Host to Network short
+	sin.sin_family = AF_INET;
+	sin.sin_addr.s_addr = htonl(INADDR_ANY);	// Host to Network long
+	sin.sin_port = htons(UDP_PORT);				// Host to Network short
 
-	socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
+	// Create the socket for UDP
+	int socket_descriptor = socket(PF_INET, SOCK_DGRAM, 0);
 
-	bind (socketDescriptor, (struct sockaddr*) &sin, sizeof(sin));
+	// Bind the socket to the port that we specify
+	bind(socket_descriptor, (struct sockaddr*) &sin, sizeof(sin));
 
-	while(!stopProgram) {
-		char message[MSG_MAX_LEN];
-		unsigned int sin_len = sizeof(sin);
-		int bytesRx = recvfrom(socketDescriptor, message, MSG_MAX_LEN, 0, (struct sockaddr *) &sin, &sin_len);
-		message[bytesRx] = 0;
-		char* token = strtok(message, " ");
-		if((strcmp(message, "help\n") == 0) || (strcmp(message, "help") == 0)) {
-			strcpy(message, "Accepted command examples:\ncount -- display number arrays sorted.\nget length -- display length of array currently being sorted.\nget array -- display the full array being sorted.\nget 10 -- display the tenth element of array currently being sorted.\nstop -- cause the server program to end.\n");
-
-		} else if(strcmp(token, "add") == 0) {
-			char* token1 = strtok(NULL, " ");
-			char* token2 = strtok(NULL, " ");
-			char* pEnd;
-			int base = 10;
-			int hour = strtol (token1,&pEnd,base);
-			int minute = strtol (token2,&pEnd,base);
-			message[0] = '\0';
-			printf("hour: %d    minute:%d\n", hour, minute);
-			addAlarm(hour, minute);
-
-		} else if(strcmp(token, "stop\n") == 0) {
-			stopProgram = true;
-			snprintf(message, MSG_MAX_LEN, "Program Terminating\n");
-		} else {
-			snprintf(message, MSG_MAX_LEN, "Not a valid command\n");
-		}
+	while (continueUdpServer == true) {
+		// Get the data (blocking)
+		// Will change sin (the address) to be the address of the client.
 		sin_len = sizeof(sin);
-		sendto( socketDescriptor,
-			message, strlen(message),
-			0,
-			(struct sockaddr *) &sin, sin_len);
+		int bytesRx = recvfrom(socket_descriptor, message, MAX_RECEIVE_MESSAGE_LENGTH, 0,
+				(struct sockaddr *) &sin, &sin_len);
 
+		// Make it null terminated (so string functions work):
+		message[bytesRx] = 0;
+		printf("Message received (%d bytes): \n\n'%s'\n", bytesRx, message);
 
+		processUDPCommand(message, socket_descriptor, &sin);
 
+		// Transmit a reply (if desired):
+		if (strnlen(replyBuffer, REPLY_BUFFER_SIZE) > 0) {
+			sin_len = sizeof(sin);
+			sendto( socket_descriptor,
+				replyBuffer, strnlen(replyBuffer, REPLY_BUFFER_SIZE),
+				0,
+				(struct sockaddr *) &sin, sin_len);
+		}
 	}
-	close(socketDescriptor);
+
+	// Close socket on shut-down
+	close(socket_descriptor);
 	return NULL;
 }
 
-_Bool UDP_checkStop(){
-	return stopProgram;
+_Bool isUdpThisCommand(char* udpMessage, const char* command)
+{
+	return strncmp(udpMessage, command, strlen(command)) == 0;
+}
+
+
+static void processUDPCommand(char* udpCommand, int socketDescriptor, struct sockaddr_in *pSin)
+{
+	replyBuffer[0] = 0;
+
+	sprintf(replyBuffer, "Recv'd on c application.\n");
+
+	char *data;
+
+	if (isUdpThisCommand(udpCommand, COMMAND_TEST)) {
+		data = extractPacketData(udpCommand);
+		printf("----COMMAND RECIEVED: %s----\n", data);
+	} 
+}
+
+static char *extractPacketData(char *buffer)
+{
+	char *extractData = NULL;
+	// Retrieve the data from the UDP packet
+	// The data being sent from webserver is assumed to be in this format: command:(Value)
+	if (buffer != NULL)
+	{
+		// Data will appear after the semicolon
+		extractData = strchr(buffer, ':') + 1;
+	}
+
+	return extractData;
 }

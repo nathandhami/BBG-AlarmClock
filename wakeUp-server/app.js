@@ -4,10 +4,10 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-const nconf = require('./src/nconf/nConfig');
-const mongoose = require('mongoose');
-const expressSession = require('express-session');
-const MongoStore = require('connect-mongo')(expressSession);
+var nconf = require('./src/nconf/nConfig');
+var mongoose = require('mongoose');
+var expressSession = require('express-session');
+var MongoStore = require('connect-mongo')(expressSession);
 
 var index = require('./routes/index');
 
@@ -42,6 +42,12 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
+
+var socketClient = require('socket.io-client')(nconf.get('http:url'));
+socketClient.on('connect', function(data) {
+  socketClient.emit('handshake');
+});
+app.set('socketClient', socketClient);
 
 app.use('/', index);
 

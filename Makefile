@@ -1,6 +1,3 @@
-# Makefile for building embedded application.
-# by Brian Fraser
-
 # Edit this file to compile extra C files into their own programs.
 TARGET= lcd
 
