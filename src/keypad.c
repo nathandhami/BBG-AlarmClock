@@ -39,9 +39,8 @@
 #define NUM_OF_ROWS 4
 #define NUM_OF_COLS 4
 
-// Row 1, column 1 starts at the bottom right for the keypad hardware
-// Matrix rows start @ index 0 .. NUM_OF_ROWS-1 from the bottom
-// and matrix columns start from far right @ index 0 .. NUM_OF_COLS-1
+// This is mapped according to keypad hardware where columns
+// starts from the far right and rows start at the bottom
 const static char keypadMap[NUM_OF_ROWS][NUM_OF_COLS] = { { 'D', '#', '0', '*' },
 										 	 	 	 	  { 'C', '9', '8', '7' },
 														  { 'B', '6', '5', '4' },
@@ -66,19 +65,19 @@ void Keypad_init(void)
 	Utils_changePinDirection(GPIO_KEYPAD_COL4_FILEPATH_DIR, "out");
 }
 
-void Keypad_setColumnActive(eKEYPAD_ACTIVATE_COL col, int value)
+void Keypad_setColumnActive(eKEYPAD_COL col, int value)
 {
 	switch (col){
-		case KEYPAD_ACTIVATE_COL1:
+		case KEYPAD_COL_1:
 			Utils_writeToOutputPin(GPIO_KEYPAD_COL1_FILEPATH_VAL, value);
 			break;
-		case KEYPAD_ACTIVATE_COL2:
+		case KEYPAD_COL_2:
 			Utils_writeToOutputPin(GPIO_KEYPAD_COL2_FILEPATH_VAL, value);
 			break;
-		case KEYPAD_ACTIVATE_COL3:
+		case KEYPAD_COL_3:
 			Utils_writeToOutputPin(GPIO_KEYPAD_COL3_FILEPATH_VAL, value);
 			break;
-		case KEYPAD_ACTIVATE_COL4:
+		case KEYPAD_COL_4:
 			Utils_writeToOutputPin(GPIO_KEYPAD_COL4_FILEPATH_VAL, value);
 			break;
 		default:
@@ -87,21 +86,21 @@ void Keypad_setColumnActive(eKEYPAD_ACTIVATE_COL col, int value)
 	}
 }
 
-_Bool Keypad_readRow(eKEYPAD_READ_ROW row)
+_Bool Keypad_readRow(eKEYPAD_ROW row)
 {
 	_Bool rowActive = false;
 
 	switch (row){
-		case KEYPAD_READ_ROW1:
+		case KEYPAD_ROW_1:
 			rowActive = Utils_readInputPin(GPIO_KEYPAD_ROW1_FILEPATH_VAL);
 			break;
-		case KEYPAD_READ_ROW2:
+		case KEYPAD_ROW_2:
 			rowActive = Utils_readInputPin(GPIO_KEYPAD_ROW2_FILEPATH_VAL);
 			break;
-		case KEYPAD_READ_ROW3:
+		case KEYPAD_ROW_3:
 			rowActive = Utils_readInputPin(GPIO_KEYPAD_ROW3_FILEPATH_VAL);
 			break;
-		case KEYPAD_READ_ROW4:
+		case KEYPAD_ROW_4:
 			rowActive = Utils_readInputPin(GPIO_KEYPAD_ROW4_FILEPATH_VAL);
 			break;
 		default:
@@ -112,7 +111,7 @@ _Bool Keypad_readRow(eKEYPAD_READ_ROW row)
 	return rowActive;
 }
 
-char Keypad_keyPressed(eKEYPAD_READ_ROW row, eKEYPAD_ACTIVATE_COL col)
+char Keypad_keyPressed(eKEYPAD_ROW row, eKEYPAD_COL col)
 {
 	return keypadMap[row][col];
 }
