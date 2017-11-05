@@ -9,24 +9,18 @@
 #ifndef ALARM_H
 #define ALARM_H
 
-#define ALARM_SIZE 20
-
 typedef struct Alarm_t{
 	int hours;
 	int minutes;
-	_Bool has_beep;
+	bool has_beep;
 }Alarm_t;
-
-Alarm_t alarm_clock[ALARM_SIZE];
-int size;
-int today;
 
 void waitDelay(long sec, long nanoSec);
 
 void startProgram();
 
 void checkAlarm(int hour, int minute);
-void beep();
+void beep(bool* beep);
 void resetAlarmBeep(int day);
 _Bool stopAlarm();
 

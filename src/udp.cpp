@@ -128,4 +128,3 @@ static char *extractPacketData(char *buffer)
 
 	return extractData;
 }
-
