@@ -34,7 +34,7 @@ static int secondWordToInt(char *string);
 static void concatValuesToString(char *targetBuffer, int data[], int indexStart, int indexEnd);
 static char *extractPacketData(char *buffer);
 
-void UdpListener_startListening(void)
+void UDP_startServer(void)
 {
 	printf("Starting UDP server...\n");
 	pthread_create(&s_threadId, NULL, &udpListeningThread, NULL);

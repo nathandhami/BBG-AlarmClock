@@ -10,5 +10,5 @@ int main (int argc, char *argv []) {
 		waitDelay(1, 0);
 	}
 
-	UDP_stopServer();
+	UDP_cleanup();
 }
