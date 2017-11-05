@@ -1,9 +1,9 @@
 {
   "http": {
-    "port": 3000
+    "port": 8088
   },
   "db":{
-    "url": "mongodb://localhost/users"
+    "url": "mongodb://192.168.7.1/alarms"
   },
   "session": {
     "secret": "skill-alarm"
