@@ -25,14 +25,8 @@ function handleCommand(socket) {
 		console.log('recieved connection');
 	});
 
-	socket.on('test', function(){
-		console.log('testing complete');
-	});
-
-	socket.on('stop', function(data) {
-		var buffer = new Buffer("stop");
-
-		socket.emit('keepalive');		
+	socket.on('test', function(data) {
+		var buffer = new Buffer("test:WAKEUP");	
 
 		var client = dgram.createSocket('udp4');
 		client.send(buffer, 0, buffer.length, PORT, HOST, function(err, bytes) {
@@ -54,12 +48,6 @@ function handleCommand(socket) {
 		    
 		    client.close();
 
-		});
-		client.on("UDP Client: close", function() {
-		    console.log("closed");
-		});
-		client.on("UDP Client: error", function(err) {
-		    console.log("error: ",err);
 		});
 	});
 

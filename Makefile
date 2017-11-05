@@ -1,11 +1,8 @@
-# Makefile for building embedded application.
-# by Brian Fraser
-
 # Edit this file to compile extra C files into their own programs.
-TARGET= lcd
+TARGET= wakeup-app
 SRC_DIR= src/
 SOURCES= $(SRC_DIR)main.cpp $(SRC_DIR)I2CIO.cpp $(SRC_DIR)LCD.cpp $(SRC_DIR)LiquidCrystal_I2C.cpp \
-	   	 $(SRC_DIR)i2c-dev.h $(SRC_DIR)utils.c
+	   	 $(SRC_DIR)i2c-dev.h $(SRC_DIR)utils.c $(SRC_DIR)udp.cpp
 
 LFLAGS = -Llib -lpthread
 IFLAGS = -Iincludes
@@ -22,10 +19,10 @@ CFLAGS = -Wall -g -D _POSIX_C_SOURCE=200809L -std=c++11
 # -pg for supporting gprof profiling.
 #CFLAGS += -pg
 
-all: lcd nodeserver
+all: app nodeserver
 	
-lcd:
-	$(CC_CPP) $(CFLAGS) $(LFLAGS) $(IFLAGS) $(SOURCES) -o $(OUTDIR)/$(TARGET)
+app:
+	$(CC_CPP) $(CFLAGS) $(IFLAGS) $(SOURCES) -o $(OUTDIR)/$(TARGET) $(LFLAGS)
 			
 nodeserver:
 		mkdir -p $(PUBDIR)/$(NODEDIR)-copy

@@ -6,10 +6,12 @@
  **/
 #include "LiquidCrystal_I2C.h"
 #include "utils.h"
+#include "udp.h"
 #include <stdio.h>
 #include <ctime>
 #include <chrono>
 #include <iostream>
+
 using namespace std;
 #define VIRTUAL_CAPE_FILE "/sys/devices/platform/bone_capemgr/slots"
 
@@ -19,6 +21,9 @@ void* timeThread(void);
 bool threadDone = 0;
 
 int main (int argc, char *argv []) {
+
+	// start upd thread to connect with nodejs webserver
+	UdpListener_startListening();
 
 	//set virtual cape
 	Utils_loadVirtualCape("BB-I2C1");

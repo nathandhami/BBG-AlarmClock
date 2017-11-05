@@ -1,7 +1,9 @@
 #ifndef _UDPSERVER_H_
 #define _UDPSERVER_H_
-// Begin/end the background thread UDP server.
-void UDP_startServer(void);
-void UDP_stopServer(void);
-_Bool UDP_checkStop(void);
+
+// Start listening to the UDP port on a separate thread.
+void UdpListener_startListening(void);
+
+void UdpListener_cleanup(void);
+
 #endif
