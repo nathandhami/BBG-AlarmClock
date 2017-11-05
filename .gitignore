@@ -2,6 +2,7 @@
 *.settings
 .project
 .cproject
+*.o
 
 # Node Modules
 wakeUp/node_modules

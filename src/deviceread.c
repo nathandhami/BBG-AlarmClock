@@ -4,7 +4,7 @@
  *  Created on: Oct 27, 2017
  *      Author: ndhami
  */
-
+#define _BSD_SOURCE
 #include <stdio.h>
 #include <stdbool.h>
 #include <pthread.h>
@@ -28,7 +28,7 @@ void DeviceRead_startReading(void)
 
 static void *readingInputs(void *arg)
 {
-	int currentColumn = KEYPAD_ACTIVATE_COL1;
+	int currentColumn = KEYPAD_COL_1;
 	while (isReading)
 	{
 //		// Algorithm for reading keypad inputs
@@ -41,42 +41,42 @@ static void *readingInputs(void *arg)
 
 //		printf("current column %d\n", currentColumn);
 
-		isRowActive = Keypad_readRow(KEYPAD_READ_ROW1);
+		isRowActive = Keypad_readRow(KEYPAD_ROW_1);
 
 		if (isRowActive == true) {
-			printf("user pressed row %d, col %d: %c\n", KEYPAD_READ_ROW1, currentColumn,
-					Keypad_keyPressed(KEYPAD_READ_ROW1, currentColumn));
+			printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_1, currentColumn,
+					Keypad_keyPressed(KEYPAD_ROW_1, currentColumn));
 			usleep(DEBOUNCER_TIME);
 		}
 
-		isRowActive = Keypad_readRow(KEYPAD_READ_ROW2);
+		isRowActive = Keypad_readRow(KEYPAD_ROW_2);
 
 		if (isRowActive == true) {
-			printf("user pressed row %d, col %d: %c\n", KEYPAD_READ_ROW2,currentColumn,
-					Keypad_keyPressed(KEYPAD_READ_ROW2, currentColumn));
+			printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_2,currentColumn,
+					Keypad_keyPressed(KEYPAD_ROW_2, currentColumn));
 			usleep(DEBOUNCER_TIME);
 		}
-		isRowActive = Keypad_readRow(KEYPAD_READ_ROW3);
+		isRowActive = Keypad_readRow(KEYPAD_ROW_3);
 
 		if (isRowActive == true) {
-			printf("user pressed row %d, col %d: %c\n", KEYPAD_READ_ROW3, currentColumn,
-					Keypad_keyPressed(KEYPAD_READ_ROW3, currentColumn));
+			printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_3, currentColumn,
+					Keypad_keyPressed(KEYPAD_ROW_3, currentColumn));
 			usleep(DEBOUNCER_TIME);
 		}
-		isRowActive = Keypad_readRow(KEYPAD_READ_ROW4);
+		isRowActive = Keypad_readRow(KEYPAD_ROW_4);
 
 		if (isRowActive == true) {
-			printf("user pressed row %d, col %d: %c\n", KEYPAD_READ_ROW4, currentColumn,
-					Keypad_keyPressed(KEYPAD_READ_ROW4, currentColumn));
+			printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_4, currentColumn,
+					Keypad_keyPressed(KEYPAD_ROW_4, currentColumn));
 			usleep(DEBOUNCER_TIME);
 		}
 
 		// deactivate current column
 		// set next column active
 		Keypad_setColumnActive(currentColumn, 0);
-		currentColumn = (currentColumn + 1) % (KEYPAD_ACTIVATE_COL_MAX);
+		currentColumn = (currentColumn + 1) % (KEYPAD_COL_MAX);
 
-		if (currentColumn == KEYPAD_ACTIVATE_COL_MAX){
+		if (currentColumn == KEYPAD_COL_MAX){
 			currentColumn = 0;
 		}
 	}
