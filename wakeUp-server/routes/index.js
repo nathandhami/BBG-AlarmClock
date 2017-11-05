@@ -3,8 +3,11 @@ var xssFilters = require('xss-filters');
 var Alarm = require('../models/Alarm');
 var router = express.Router();
 
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
+    var socketClient = req.app.get('socketClient');
+    socketClient.emit('test');
     Alarm.find({}, function(err, alarms) {
 	    if (err){ 
 	    	throw err;
