@@ -28,6 +28,87 @@ function handleCommand(socket) {
 	socket.on('initArray', function(data) {
 	
 		var buffer = new Buffer("initArray:" + data);	
+
+		var client = dgram.createSocket('udp4');
+		client.send(buffer, 0, buffer.length, PORT, HOST, function(err, bytes) {
+		    if (err) 
+		    	throw err;
+		    console.log('UDP message sent to ' + HOST +':'+ PORT);
+		});
+		
+		client.on('listening', function () {
+		    var address = client.address();
+		    console.log('UDP Client: listening on ' + address.address + ":" + address.port);
+		});
+		// Handle an incoming message over the UDP from the local application.
+		client.on('message', function (message, remote) {
+		    console.log("UDP Client: message Rx" + remote.address + ':' + remote.port +' - ' + message);
+		    
+		    var reply = message.toString('utf8')
+		    socket.emit('commandReply', reply);
+		    
+		    client.close();
+
+		});
+	});
+
+	socket.on('createAlarm', function(data) {
+	
+		var buffer = new Buffer("createAlarm:" + data);	
+		
+		var client = dgram.createSocket('udp4');
+		client.send(buffer, 0, buffer.length, PORT, HOST, function(err, bytes) {
+		    if (err) 
+		    	throw err;
+		    console.log('UDP message sent to ' + HOST +':'+ PORT);
+		});
+		
+		client.on('listening', function () {
+		    var address = client.address();
+		    console.log('UDP Client: listening on ' + address.address + ":" + address.port);
+		});
+		// Handle an incoming message over the UDP from the local application.
+		client.on('message', function (message, remote) {
+		    console.log("UDP Client: message Rx" + remote.address + ':' + remote.port +' - ' + message);
+		    
+		    var reply = message.toString('utf8')
+		    socket.emit('commandReply', reply);
+		    
+		    client.close();
+
+		});
+	});
+
+	socket.on('editAlarm', function(data) {
+	
+		var buffer = new Buffer("editAlarm:" + data);	
+		
+		var client = dgram.createSocket('udp4');
+		client.send(buffer, 0, buffer.length, PORT, HOST, function(err, bytes) {
+		    if (err) 
+		    	throw err;
+		    console.log('UDP message sent to ' + HOST +':'+ PORT);
+		});
+		
+		client.on('listening', function () {
+		    var address = client.address();
+		    console.log('UDP Client: listening on ' + address.address + ":" + address.port);
+		});
+		// Handle an incoming message over the UDP from the local application.
+		client.on('message', function (message, remote) {
+		    console.log("UDP Client: message Rx" + remote.address + ':' + remote.port +' - ' + message);
+		    
+		    var reply = message.toString('utf8')
+		    socket.emit('commandReply', reply);
+		    
+		    client.close();
+
+		});
+	});
+
+	socket.on('deleteAlarm', function(data) {
+	
+		var buffer = new Buffer("deleteAlarm:" + data.toString());	
 		
 		var client = dgram.createSocket('udp4');
 		client.send(buffer, 0, buffer.length, PORT, HOST, function(err, bytes) {

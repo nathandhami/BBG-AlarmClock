@@ -40,8 +40,6 @@ static _Bool continueUdpServer = true;
 // Header
 static void *udpListeningThread(void *args);
 static void processUDPCommand(char* udpCommand, int socketDescriptor, struct sockaddr_in *pSin);
-static int secondWordToInt(char *string);
-static void concatValuesToString(char *targetBuffer, int data[], int indexStart, int indexEnd);
 static char *extractPacketData(char *buffer);
 static vector<char*> splitString(char* str, char* delimiter);
 static vector<Alarm_t> parseAlarmData(char* alarmData);
@@ -88,7 +86,7 @@ static void *udpListeningThread(void *args)
 
 		// Make it null terminated (so string functions work):
 		message[bytesRx] = 0;
-		printf("Message received (%d bytes): \n", bytesRx);
+		printf("Message received (%d bytes): \n%s\n\n", bytesRx, message);
 
 		processUDPCommand(message, socket_descriptor, &sin);
 
@@ -130,14 +128,14 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 	} 
 	else if (isUdpThisCommand(udpCommand, COMMAND_CREATE_ALARM)) {
 		data = extractPacketData(udpCommand);
-		Struct Alarm_t alarm = parseAlarmData(data)[0];
+		struct Alarm_t alarm = parseAlarmData(data)[0];
 
 		//CREATE new alarm in alarm.c from above new alarm
 
 	}
 	else if (isUdpThisCommand(udpCommand, COMMAND_EDIT_ALARM)) {
 		data = extractPacketData(udpCommand);
-		Struct Alarm_t alarm = parseAlarmData(data)[0];
+		struct Alarm_t alarm = parseAlarmData(data)[0];
 
 		//EDIT alarm in alarm.c from above object
 		//use ID field in alarm[i] to edit which one
@@ -145,9 +143,12 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 	} 
 	else if (isUdpThisCommand(udpCommand, COMMAND_DELETE_ALARM)) {
 		data = extractPacketData(udpCommand);
-		Struct Alarm_t alarm = parseAlarmData(data)[0];
+		int id;
+		if (data != NULL) {
+			id = atoi(data);
+		}
 
-		//DELETE alarm using id from above object
+		//DELETE alarm using id from alarm object
 
 	} 
 }
@@ -184,14 +185,14 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 
 	vector<Alarm_t> totalAlarms;
 
-	char* delimiter = "\n";
+	char* delimiter = (char *)"\n";
 	vector<char*> alarms = splitString(alarmData, delimiter);
 
-	for (int i = 0; i < alarms.size(); i++) {
-		delimiter = "-";
+	for (unsigned int i = 0; i < alarms.size(); i++) {
+		delimiter = (char *)"-";
 		vector<char*> alarmSplitted = splitString(alarms[i], delimiter);
 
-		delimiter = "=";
+		delimiter = (char *)"=";
 		char* timeString = splitString(alarmSplitted[0], delimiter)[1];
 		char* statusString = splitString(alarmSplitted[1], delimiter)[1];
 		char* levelString = splitString(alarmSplitted[2], delimiter)[1];
@@ -203,9 +204,9 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 		    isTimePM = true;
 		}
 
-		delimiter = " ";
+		delimiter = (char *)" ";
 		char* timeNumberString = splitString(timeString, delimiter)[0];
-		delimiter = ":";
+		delimiter = (char *)":";
 		int hour = atoi(splitString(timeNumberString, delimiter)[0]);
 		int mins =  atoi(splitString(timeNumberString, delimiter)[1]);
 		if (isTimePM) {
@@ -226,10 +227,10 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 			difficulty = 2;
 		}
 
-		delimiter = ",";
+		delimiter = (char *)",";
 		vector<char*> isDaysOn = splitString(daysString, delimiter);
 		_Bool days[] = {false, false, false, false, false, false, false};
-		for (int j = 0; j < isDaysOn.size(); j++) {
+		for (unsigned int j = 0; j < isDaysOn.size(); j++) {
 			if (strcmp(isDaysOn[j], "on") == 0) {
 				days[j] = true;
 			}
