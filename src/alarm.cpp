@@ -376,7 +376,7 @@ void testUser() {
 		} if(questionType == 1) {
 			arg1 = rand() % 10 + 1;
 			arg2 = rand() % 10 + 1;
-			answer = arg1 + arg2;
+			answer = arg1 * arg2;
 			sprintf (question, "%d x %d =", arg1, arg2);
 		}
 
@@ -401,7 +401,9 @@ void testUser() {
 		if(pressed != 'x') {
 			lcd.write(pressed);
 			enteredAnswer.push_back(pressed);
-			if(enteredAnswer.size() == len) {
+			if(pressed == '*') {
+				enteredAnswer.pop_back();
+				cout << enteredAnswer << "real answer: " << answer << endl;
 				if(stoi(enteredAnswer) == answer) {
 					lcd.clear();
 					lcd.print("correct");
