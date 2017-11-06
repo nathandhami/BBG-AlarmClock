@@ -17,6 +17,7 @@
 #define MAX_RECEIVE_MESSAGE_LENGTH 8000
 #define REPLY_BUFFER_SIZE (1500)
 #define VALUES_PER_LINE 4
+#define DAYS_IN_WEEK 7
 
 // THESE ARE THE IDS FOR NODEJS PACKETS.
 // SETTER COMMANDS
@@ -84,7 +85,7 @@ static void *udpListeningThread(void *args)
 
 		// Make it null terminated (so string functions work):
 		message[bytesRx] = 0;
-		printf("Message received (%d bytes): \n\n'%s'\n", bytesRx, message);
+		printf("Message received (%d bytes): \n", bytesRx);
 
 		processUDPCommand(message, socket_descriptor, &sin);
 
@@ -120,9 +121,18 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 	if (isUdpThisCommand(udpCommand, COMMAND_TEST)) {
 		data = extractPacketData(udpCommand);
 
-		printf("----COMMAND RECIEVED: %s----\n\n", data);
-
 		vector<Alarm_t> alarmClocks = parseAlarmData(data);
+
+		for (int i = 0; i < alarmClocks.size(); i++) {
+			printf("----> \nDays: ");
+			for (int j = 0; j < DAYS_IN_WEEK; j++) {
+				printf("%d, ", alarmClocks[i].days[j]);
+			}
+			printf("\nTime: %d hour, %d minutes.\n", alarmClocks[i].hours, alarmClocks[i].minutes);
+			printf("Status: %d.\n", alarmClocks[i].status);
+			printf("Difficulty: %d.\n", alarmClocks[i].difficulty);
+			printf("ID: %d.\n", alarmClocks[i].id);
+		}
 
 	} 
 }
@@ -173,9 +183,56 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 		char* daysString = splitString(alarmSplitted[3], delimiter)[1];
 		char* idString = splitString(alarmSplitted[4], delimiter)[1];
 
-		printf("----> \nTime: %s\nStatusOn: %s\n", timeString, statusString);
-		printf("Difficulty: %s\nDays: %s\n", levelString, daysString);
-		printf("ID: %s\n", idString);
+		_Bool isTimePM;
+		if (((string)timeString).find("PM") != string::npos) {
+		    isTimePM = true;
+		}
+
+		delimiter = " ";
+		char* timeNumberString = splitString(timeString, delimiter)[0];
+		delimiter = ":";
+		int hour = atoi(splitString(timeNumberString, delimiter)[0]);
+		int mins =  atoi(splitString(timeNumberString, delimiter)[1]);
+		if (isTimePM) {
+			if (hour < 12) {
+				hour += 12;
+			}
+		}
+
+		_Bool status = true;
+		if (strcmp(statusString, "false") == 0) {
+			status = false;
+		}
+
+		int difficulty = 0;
+		if (strcmp(levelString, "medium") == 0) {
+			difficulty = 1;
+		} else if (strcmp(levelString, "hard") == 0) {
+			difficulty = 2;
+		}
+
+		delimiter = ",";
+		vector<char*> isDaysOn = splitString(daysString, delimiter);
+		_Bool days[] = {false, false, false, false, false, false, false};
+		for (int j = 0; j < isDaysOn.size(); j++) {
+			if (strcmp(isDaysOn[j], "on") == 0) {
+				days[j] = true;
+			}
+		}
+
+		int id = atoi(idString);
+
+		struct Alarm_t a;
+		a.hours = hour;
+		a.minutes = mins;
+		a.status = status;
+		a.difficulty = difficulty;
+		a.id = id;
+		for (int j = 0; j < DAYS_IN_WEEK; j++) {
+			a.days[j] = days[j];
+		}
+
+		totalAlarms.push_back(a);
 	}
 
 	return totalAlarms;
