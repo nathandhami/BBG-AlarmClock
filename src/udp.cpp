@@ -1,5 +1,6 @@
 
 #include "udp.h"
+#include "alarm.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,20 +9,25 @@
 #include <unistd.h>			// for close()
 #include <pthread.h>
 #include <stdbool.h>
+#include <iostream>
+#include <vector>
+#include <string.h>
 
 #define UDP_PORT 12345
-#define MAX_RECEIVE_MESSAGE_LENGTH 1024
+#define MAX_RECEIVE_MESSAGE_LENGTH 8000
 #define REPLY_BUFFER_SIZE (1500)
 #define VALUES_PER_LINE 4
 
 // THESE ARE THE IDS FOR NODEJS PACKETS.
 // SETTER COMMANDS
-#define COMMAND_TEST        "test"
+#define COMMAND_TEST        "initArray"
 
 
 // This macro will retrieve the data from the UDP packet
 // The data being sent from webserver is assumed to be in this format: command:(Value)
 #define RETRIEVE_PACKET_DATA(buffer) strchr((buffer), ':') + 1
+
+using namespace std;
 
 static pthread_t s_threadId;
 static char replyBuffer[REPLY_BUFFER_SIZE];
@@ -33,6 +39,8 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 static int secondWordToInt(char *string);
 static void concatValuesToString(char *targetBuffer, int data[], int indexStart, int indexEnd);
 static char *extractPacketData(char *buffer);
+static vector<char*> splitString(char* str, char* delimiter);
+static vector<Alarm_t> parseAlarmData(char* alarmData);
 
 void UDP_startServer(void)
 {
@@ -107,11 +115,15 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 
 	sprintf(replyBuffer, "Recv'd on c application.\n");
 
-	char *data;
+	char* data;
 
 	if (isUdpThisCommand(udpCommand, COMMAND_TEST)) {
 		data = extractPacketData(udpCommand);
-		printf("----COMMAND RECIEVED: %s----\n", data);
+
+		printf("----COMMAND RECIEVED: %s----\n\n", data);
+
+		vector<Alarm_t> alarmClocks = parseAlarmData(data);
+
 	} 
 }
 
@@ -127,4 +139,45 @@ static char *extractPacketData(char *buffer)
 	}
 
 	return extractData;
+}
+
+static vector<char*> splitString(char* str, char* delimiter) {
+	vector<char*> packetElements;
+	char* element;
+
+	element = strtok(str, delimiter);
+	while (element != NULL)
+	{
+		packetElements.push_back(element);
+		element = strtok (NULL, delimiter);
+	}
+
+	return packetElements;
+}
+
+static vector<Alarm_t> parseAlarmData(char* alarmData) {
+
+	vector<Alarm_t> totalAlarms;
+
+	char* delimiter = "\n";
+	vector<char*> alarms = splitString(alarmData, delimiter);
+
+	for (int i = 0; i < alarms.size(); i++) {
+		delimiter = "-";
+		vector<char*> alarmSplitted = splitString(alarms[i], delimiter);
+
+		delimiter = "=";
+		char* timeString = splitString(alarmSplitted[0], delimiter)[1];
+		char* statusString = splitString(alarmSplitted[1], delimiter)[1];
+		char* levelString = splitString(alarmSplitted[2], delimiter)[1];
+		char* daysString = splitString(alarmSplitted[3], delimiter)[1];
+		char* idString = splitString(alarmSplitted[4], delimiter)[1];
+
+		printf("----> \nTime: %s\nStatusOn: %s\n", timeString, statusString);
+		printf("Difficulty: %s\nDays: %s\n", levelString, daysString);
+		printf("ID: %s\n", idString);
+	}
+
+	return totalAlarms;
+
 }

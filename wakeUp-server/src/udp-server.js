@@ -25,9 +25,10 @@ function handleCommand(socket) {
 		console.log('recieved connection');
 	});
 
-	socket.on('test', function(data) {
-		var buffer = new Buffer("test:WAKEUP");	
-
+	socket.on('initArray', function(data) {
+	
+		var buffer = new Buffer("initArray:" + data);	
+		
 		var client = dgram.createSocket('udp4');
 		client.send(buffer, 0, buffer.length, PORT, HOST, function(err, bytes) {
 		    if (err) 
