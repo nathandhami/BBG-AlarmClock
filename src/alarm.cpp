@@ -403,7 +403,6 @@ void testUser() {
 			enteredAnswer.push_back(pressed);
 			if(pressed == '*') {
 				enteredAnswer.pop_back();
-				cout << enteredAnswer << "real answer: " << answer << endl;
 				if(stoi(enteredAnswer) == answer) {
 					lcd.clear();
 					lcd.print("correct");
