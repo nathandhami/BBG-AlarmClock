@@ -52,8 +52,6 @@ router.route('/alarm/set')
     days.push(xssFilters.inHTMLData(req.body.friday));
     days.push(xssFilters.inHTMLData(req.body.saturday));
 
-    console.log(days);
-
     for (let i = 0; i < days.length; i++) {
       if (days[i] == 'on') {
         isDaySet = true;
@@ -64,9 +62,6 @@ router.route('/alarm/set')
     // TODO: date time zone needs to be set!
     if (!isDaySet) {
       var now = new Date();
-
-      console.log(now);
-
       var index = now.getDay();
       days[index] = 'on';
     }
