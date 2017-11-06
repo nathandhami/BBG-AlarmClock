@@ -16,7 +16,7 @@ CPP_OBJ_LIST = $(addsuffix .o, $(basename $(CPP_SOURCES)))
 C_OBJ = $(addprefix $(OBJDIR)/, $(C_OBJ_LIST))
 CPP_OBJ = $(addprefix $(OBJDIR)/, $(CPP_OBJ_LIST))
 
-LFLAGS = -Llib -lpthread -lasound
+LFLAGS = -Llib -lpthread -lasound -static-libstdc++
 IFLAGS = -Iincludes -L$(HOME)/cmpt433/public/asound_lib_BBB
 
 PUBDIR = $(HOME)/cmpt433/public/myApps

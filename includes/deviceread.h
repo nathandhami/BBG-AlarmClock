@@ -11,5 +11,6 @@
 
 void DeviceRead_startReading(void);
 void DeviceRead_stopReading(void);
+char getPressed();
 
 #endif /* DEVICEREAD_H_ */

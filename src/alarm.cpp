@@ -5,6 +5,8 @@
 #include <chrono>
 #include <iostream>
 #include <pthread.h>
+#include <mutex>
+#include <string>
 extern "C" {
 	#include "deviceread.h"
 	#include "utils.h"
@@ -21,32 +23,32 @@ extern "C" {
 #define ALARM_SIZE 20
 using namespace std;
 
-pthread_t alarm_thread;
-pthread_t display_time_thread;
-int size;
-int today;
-Alarm_t alarm_clock[ALARM_SIZE];
+static pthread_t alarm_thread;
+static pthread_t display_time_thread;
+static int size;
+static int today;
+static Alarm_t alarm_clock[ALARM_SIZE];
 
-const char * months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-const char * days[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+static const char * months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+static const char * days[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 // i2c address
-uint8_t i2c=0x3f;
+static uint8_t i2c=0x3f;
 // Control line PINs
-uint8_t en=2;
-uint8_t rw=1;
-uint8_t rs=0;
+static uint8_t en=2;
+static uint8_t rw=1;
+static uint8_t rs=0;
 // Data line PINs
-uint8_t d4=4;
-uint8_t d5=5;
-uint8_t d6=6;
-uint8_t d7=7;
+static uint8_t d4=4;
+static uint8_t d5=5;
+static uint8_t d6=6;
+static uint8_t d7=7;
 // Backlight PIN
-uint8_t bl=3;
+static uint8_t bl=3;
 // LCD display size
-uint8_t rows=2;
-uint8_t cols=16;
-LiquidCrystal_I2C lcd("/dev/i2c-1", i2c, en, rw, rs, d4, d5, d6, d7, bl, POSITIVE);
-
+static uint8_t rows=2;
+static uint8_t cols=16;
+static LiquidCrystal_I2C lcd("/dev/i2c-1", i2c, en, rw, rs, d4, d5, d6, d7, bl, POSITIVE);
+static mutex lcd_mutex;
 // Store data of a single wave file read into memory.
 // Space is dynamically allocated; must be freed correctly!
 typedef struct {
@@ -55,12 +57,13 @@ typedef struct {
 } wavedata_t;
 
 // Prototypes:
-snd_pcm_t *Audio_openDevice();
-void Audio_readWaveFileIntoMemory(char *fileName, wavedata_t *pWaveStruct);
-void Audio_playFile(snd_pcm_t *handle, wavedata_t *pWaveData);
-void* displayTimeThread(void*);
-void* alarmThread(void*);
-void writeToFile(char *fileName, char* value);
+static snd_pcm_t *Audio_openDevice();
+static void Audio_readWaveFileIntoMemory(char *fileName, wavedata_t *pWaveStruct);
+static void Audio_playFile(snd_pcm_t *handle, wavedata_t *pWaveData);
+static void* displayTimeThread(void*);
+static void* alarmThread(void*);
+static void writeToFile(char *fileName, char* value);
+static void testUser();
 
 void waitDelay(long sec, long nanoSec){
 	long seconds = sec;
@@ -71,8 +74,11 @@ void waitDelay(long sec, long nanoSec){
 
 
 void startProgram(){
-	setenv("TZ", "PST8PST", 1);   // set TZ
+	// set TZ
+	setenv("TZ", "PST8PST", 1);
 	tzset();
+	//initialize random seed
+	srand (time(NULL));
 	DeviceRead_startReading();
 	//opening upjoystick file to stop alarm (temporary)
 	writeToFile(EXPORTFILE,"26");
@@ -326,6 +332,8 @@ void* displayTimeThread(void*){
 	lcd.on();
 	lcd.clear();
 
+	testUser();
+
 	while(true) {
 		lcd.clear();
 		auto now = std::chrono::system_clock::now();
@@ -348,4 +356,71 @@ void* displayTimeThread(void*){
 		lcd.print(buffer2);
 		waitDelay(1, 0);
 	}
+}
+
+void testUser() {
+	lcd_mutex.lock();
+	int difficulty = 0;
+	char question[16];
+	bool answered = false;
+	int answer = 0;
+	if(difficulty == 0) {
+		int questionType = rand() % 2;
+		int arg1, arg2;
+		if(questionType == 0) {
+			arg1 = rand() % 100 + 1;
+			arg2 = rand() % 100 + 1;
+			answer = arg1 + arg2;
+			sprintf (question, "%d + %d =", arg1, arg2);
+
+		} if(questionType == 1) {
+			arg1 = rand() % 10 + 1;
+			arg2 = rand() % 10 + 1;
+			answer = arg1 + arg2;
+			sprintf (question, "%d x %d =", arg1, arg2);
+		}
+
+	} else if(difficulty == 1) {
+
+	} else if(difficulty == 2) {
+
+	}
+	lcd.clear();
+	lcd.setCursor(0, 0);
+	lcd.print(question);
+	lcd.setCursor(0, 1);
+	lcd.cursor();
+	lcd.blink();
+
+	char s[32];
+
+	int len = sprintf(s, "%d", answer);
+	string enteredAnswer = "";
+	while(!answered) {
+		char pressed = getPressed();
+		if(pressed != 'x') {
+			lcd.write(pressed);
+			enteredAnswer.push_back(pressed);
+			if(enteredAnswer.size() == len) {
+				if(stoi(enteredAnswer) == answer) {
+					lcd.clear();
+					lcd.print("correct");
+					answered = true;
+				} else {
+					enteredAnswer.clear();
+					lcd.clear();
+					lcd.setCursor(0, 0);
+					lcd.print(question);
+					lcd.setCursor(0, 1);
+					lcd.cursor();
+					lcd.blink();
+				}
+			}
+		}
+
+		waitDelay(0, 400000000);
+
+	}
+	lcd.noBlink();
+	lcd_mutex.unlock();
 }
