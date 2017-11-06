@@ -1,5 +1,6 @@
 
 #include "udp.h"
+#include "alarm.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,20 +9,29 @@
 #include <unistd.h>			// for close()
 #include <pthread.h>
 #include <stdbool.h>
+#include <iostream>
+#include <vector>
+#include <string.h>
 
 #define UDP_PORT 12345
-#define MAX_RECEIVE_MESSAGE_LENGTH 1024
+#define MAX_RECEIVE_MESSAGE_LENGTH 8000
 #define REPLY_BUFFER_SIZE (1500)
 #define VALUES_PER_LINE 4
+#define DAYS_IN_WEEK 7
 
 // THESE ARE THE IDS FOR NODEJS PACKETS.
 // SETTER COMMANDS
-#define COMMAND_TEST        "test"
+#define COMMAND_INIT_ALARMS		"initArray"
+#define COMMAND_CREATE_ALARM	"createAlarm"
+#define COMMAND_EDIT_ALARM		"editAlarm"
+#define COMMAND_DELETE_ALARM	"deleteAlarm"
 
 
 // This macro will retrieve the data from the UDP packet
 // The data being sent from webserver is assumed to be in this format: command:(Value)
 #define RETRIEVE_PACKET_DATA(buffer) strchr((buffer), ':') + 1
+
+using namespace std;
 
 static pthread_t s_threadId;
 static char replyBuffer[REPLY_BUFFER_SIZE];
@@ -30,9 +40,9 @@ static _Bool continueUdpServer = true;
 // Header
 static void *udpListeningThread(void *args);
 static void processUDPCommand(char* udpCommand, int socketDescriptor, struct sockaddr_in *pSin);
-static int secondWordToInt(char *string);
-static void concatValuesToString(char *targetBuffer, int data[], int indexStart, int indexEnd);
 static char *extractPacketData(char *buffer);
+static vector<char*> splitString(char* str, char* delimiter);
+static vector<Alarm_t> parseAlarmData(char* alarmData);
 
 void UDP_startServer(void)
 {
@@ -76,7 +86,7 @@ static void *udpListeningThread(void *args)
 
 		// Make it null terminated (so string functions work):
 		message[bytesRx] = 0;
-		printf("Message received (%d bytes): \n\n'%s'\n", bytesRx, message);
+		printf("Message received (%d bytes): \n%s\n\n", bytesRx, message);
 
 		processUDPCommand(message, socket_descriptor, &sin);
 
@@ -107,11 +117,39 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 
 	sprintf(replyBuffer, "Recv'd on c application.\n");
 
-	char *data;
+	char* data;
 
-	if (isUdpThisCommand(udpCommand, COMMAND_TEST)) {
+	if (isUdpThisCommand(udpCommand, COMMAND_INIT_ALARMS)) {
 		data = extractPacketData(udpCommand);
-		printf("----COMMAND RECIEVED: %s----\n", data);
+		vector<Alarm_t> alarmClocks = parseAlarmData(data);
+
+		//INITIALISE alarm array (change array to vector) in alarm.c to above vector object
+
+	} 
+	else if (isUdpThisCommand(udpCommand, COMMAND_CREATE_ALARM)) {
+		data = extractPacketData(udpCommand);
+		struct Alarm_t alarm = parseAlarmData(data)[0];
+
+		//CREATE new alarm in alarm.c from above new alarm
+
+	}
+	else if (isUdpThisCommand(udpCommand, COMMAND_EDIT_ALARM)) {
+		data = extractPacketData(udpCommand);
+		struct Alarm_t alarm = parseAlarmData(data)[0];
+
+		//EDIT alarm in alarm.c from above object
+		//use ID field in alarm[i] to edit which one
+
+	} 
+	else if (isUdpThisCommand(udpCommand, COMMAND_DELETE_ALARM)) {
+		data = extractPacketData(udpCommand);
+		int id;
+		if (data != NULL) {
+			id = atoi(data);
+		}
+
+		//DELETE alarm using id from alarm object
+
 	} 
 }
 
@@ -127,4 +165,92 @@ static char *extractPacketData(char *buffer)
 	}
 
 	return extractData;
+}
+
+static vector<char*> splitString(char* str, char* delimiter) {
+	vector<char*> packetElements;
+	char* element;
+
+	element = strtok(str, delimiter);
+	while (element != NULL)
+	{
+		packetElements.push_back(element);
+		element = strtok (NULL, delimiter);
+	}
+
+	return packetElements;
+}
+
+static vector<Alarm_t> parseAlarmData(char* alarmData) {
+
+	vector<Alarm_t> totalAlarms;
+
+	char* delimiter = (char *)"\n";
+	vector<char*> alarms = splitString(alarmData, delimiter);
+
+	for (unsigned int i = 0; i < alarms.size(); i++) {
+		delimiter = (char *)"-";
+		vector<char*> alarmSplitted = splitString(alarms[i], delimiter);
+
+		delimiter = (char *)"=";
+		char* timeString = splitString(alarmSplitted[0], delimiter)[1];
+		char* statusString = splitString(alarmSplitted[1], delimiter)[1];
+		char* levelString = splitString(alarmSplitted[2], delimiter)[1];
+		char* daysString = splitString(alarmSplitted[3], delimiter)[1];
+		char* idString = splitString(alarmSplitted[4], delimiter)[1];
+
+		_Bool isTimePM;
+		if (((string)timeString).find("PM") != string::npos) {
+		    isTimePM = true;
+		}
+
+		delimiter = (char *)" ";
+		char* timeNumberString = splitString(timeString, delimiter)[0];
+		delimiter = (char *)":";
+		int hour = atoi(splitString(timeNumberString, delimiter)[0]);
+		int mins =  atoi(splitString(timeNumberString, delimiter)[1]);
+		if (isTimePM) {
+			if (hour < 12) {
+				hour += 12;
+			}
+		}
+
+		_Bool status = true;
+		if (strcmp(statusString, "false") == 0) {
+			status = false;
+		}
+
+		int difficulty = 0;
+		if (strcmp(levelString, "medium") == 0) {
+			difficulty = 1;
+		} else if (strcmp(levelString, "hard") == 0) {
+			difficulty = 2;
+		}
+
+		delimiter = (char *)",";
+		vector<char*> isDaysOn = splitString(daysString, delimiter);
+		_Bool days[] = {false, false, false, false, false, false, false};
+		for (unsigned int j = 0; j < isDaysOn.size(); j++) {
+			if (strcmp(isDaysOn[j], "on") == 0) {
+				days[j] = true;
+			}
+		}
+
+		int id = atoi(idString);
+
+		struct Alarm_t a;
+		a.hours = hour;
+		a.minutes = mins;
+		a.status = status;
+		a.difficulty = difficulty;
+		a.id = id;
+		for (int j = 0; j < DAYS_IN_WEEK; j++) {
+			a.days[j] = days[j];
+		}
+
+		totalAlarms.push_back(a);
+	}
+
+	return totalAlarms;
+
 }

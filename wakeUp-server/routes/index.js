@@ -2,17 +2,32 @@ var express = require('express');
 var xssFilters = require('xss-filters');
 var Alarm = require('../models/Alarm');
 var router = express.Router();
+var isInitialised = false;
 
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
     var socketClient = req.app.get('socketClient');
-    socketClient.emit('test');
     Alarm.find({}, function(err, alarms) {
 	    if (err){ 
 	    	throw err;
 	    } 
 	    else {
+        // initialise array in C.
+        if (!isInitialised) {
+          var alarmString = "";
+          for (let i = 0; i < alarms.length; i++) {
+            alarmString += "Time=" + alarms[i].time + "-";
+            alarmString += "StatusOn=" + alarms[i].statusOn + "-";
+            alarmString += "Difficulty=" + alarms[i].level + "-";
+            alarmString += "Days=" + alarms[i].days + "-";
+            alarmString += "ID=" + alarms[i].identification;
+            alarmString += "\n";
+          }
+          socketClient.emit('initArray', alarmString);
+          isInitialised = true;
+        }
+
 	    	res.render('index', { 
 			  	title: 'Wake Up',
 			  	alarms: alarms,
@@ -23,9 +38,11 @@ router.get('/', function(req, res, next) {
 
 router.route('/alarm/set')
   .post((req, res) => {
+    var socketClient = req.app.get('socketClient');
     var alarmTime = xssFilters.inHTMLData(req.body.time);
 
     var days = [];
+    var isDaySet = false;
 
     days.push(xssFilters.inHTMLData(req.body.sunday));
     days.push(xssFilters.inHTMLData(req.body.monday));
@@ -34,6 +51,20 @@ router.route('/alarm/set')
     days.push(xssFilters.inHTMLData(req.body.thursday));
     days.push(xssFilters.inHTMLData(req.body.friday));
     days.push(xssFilters.inHTMLData(req.body.saturday));
+
+    for (let i = 0; i < days.length; i++) {
+      if (days[i] == 'on') {
+        isDaySet = true;
+        break;
+      }
+    }
+
+    // TODO: date time zone needs to be set!
+    if (!isDaySet) {
+      var now = new Date();
+      var index = now.getDay();
+      days[index] = 'on';
+    }
 
     var diff_level = xssFilters.inHTMLData(req.body.level);
     var id = xssFilters.inHTMLData(req.body.existingId);
@@ -52,15 +83,32 @@ router.route('/alarm/set')
 
         newAlarm.save((err, object) => {
           if (err) throw err;
+          var alarmString = "";
+          alarmString += "Time=" + newAlarm.time + "-";
+          alarmString += "StatusOn=" + newAlarm.statusOn + "-";
+          alarmString += "Difficulty=" + newAlarm.level + "-";
+          alarmString += "Days=" + newAlarm.days + "-";
+          alarmString += "ID=" + newAlarm.identification;
+          alarmString += "\n";
+          socketClient.emit('createAlarm', alarmString);
         });
       }
       else {
           alarm.time = alarmTime;
           alarm.days = days;
           alarm.level = diff_level;
+          alarm.status = true;
 
           alarm.save((err, object) => {
             if (err) throw err;
+            var alarmString = "";
+            alarmString += "Time=" + alarm.time + "-";
+            alarmString += "StatusOn=" + alarm.statusOn + "-";
+            alarmString += "Difficulty=" + alarm.level + "-";
+            alarmString += "Days=" + alarm.days + "-";
+            alarmString += "ID=" + alarm.identification;
+            alarmString += "\n";
+            socketClient.emit('editAlarm', alarmString);
           });
       }
 
@@ -73,6 +121,7 @@ router.route('/alarm/set')
 
 router.route('/alarm/delete')
   .post((req, res, next) => {
+    var socketClient = req.app.get('socketClient');
     var id = xssFilters.inHTMLData(req.body.alarmId);
     console.log("ALARM: " + id);
 
@@ -81,6 +130,7 @@ router.route('/alarm/delete')
         throw err;
       } else {
           alarm.remove();
+          socketClient.emit('deleteAlarm', id);
       }
 
       res.redirect('/');
@@ -90,6 +140,7 @@ router.route('/alarm/delete')
 
 router.route('/alarm/status')
   .post((req, res, next) => {
+    var socketClient = req.app.get('socketClient');
     var id = xssFilters.inHTMLData(req.body.alarmId);
     var status = xssFilters.inHTMLData(req.body.status);
 
@@ -105,6 +156,14 @@ router.route('/alarm/status')
 
           alarm.save((err, object) => {
             if (err) throw err;
+            var alarmString = "";
+            alarmString += "Time=" + alarm.time + "-";
+            alarmString += "StatusOn=" + alarm.statusOn + "-";
+            alarmString += "Difficulty=" + alarm.level + "-";
+            alarmString += "Days=" + alarm.days + "-";
+            alarmString += "ID=" + alarm.identification;
+            alarmString += "\n";
+            socketClient.emit('editAlarm', alarmString);
           });
       }
     });

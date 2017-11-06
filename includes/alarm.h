@@ -12,6 +12,10 @@
 typedef struct Alarm_t{
 	int hours;
 	int minutes;
+	int id;
+	int difficulty;
+	_Bool status;
+	_Bool days[7];
 	bool has_beep;
 }Alarm_t;
 
