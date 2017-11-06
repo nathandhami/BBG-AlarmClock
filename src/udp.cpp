@@ -21,7 +21,10 @@
 
 // THESE ARE THE IDS FOR NODEJS PACKETS.
 // SETTER COMMANDS
-#define COMMAND_TEST        "initArray"
+#define COMMAND_INIT_ALARMS		"initArray"
+#define COMMAND_CREATE_ALARM	"createAlarm"
+#define COMMAND_EDIT_ALARM		"editAlarm"
+#define COMMAND_DELETE_ALARM	"deleteAlarm"
 
 
 // This macro will retrieve the data from the UDP packet
@@ -118,21 +121,33 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 
 	char* data;
 
-	if (isUdpThisCommand(udpCommand, COMMAND_TEST)) {
+	if (isUdpThisCommand(udpCommand, COMMAND_INIT_ALARMS)) {
 		data = extractPacketData(udpCommand);
-
 		vector<Alarm_t> alarmClocks = parseAlarmData(data);
 
-		for (int i = 0; i < alarmClocks.size(); i++) {
-			printf("----> \nDays: ");
-			for (int j = 0; j < DAYS_IN_WEEK; j++) {
-				printf("%d, ", alarmClocks[i].days[j]);
-			}
-			printf("\nTime: %d hour, %d minutes.\n", alarmClocks[i].hours, alarmClocks[i].minutes);
-			printf("Status: %d.\n", alarmClocks[i].status);
-			printf("Difficulty: %d.\n", alarmClocks[i].difficulty);
-			printf("ID: %d.\n", alarmClocks[i].id);
-		}
+		//INITIALISE alarm array (change array to vector) in alarm.c to above vector object
+
+	} 
+	else if (isUdpThisCommand(udpCommand, COMMAND_CREATE_ALARM)) {
+		data = extractPacketData(udpCommand);
+		Struct Alarm_t alarm = parseAlarmData(data)[0];
+
+		//CREATE new alarm in alarm.c from above new alarm
+
+	}
+	else if (isUdpThisCommand(udpCommand, COMMAND_EDIT_ALARM)) {
+		data = extractPacketData(udpCommand);
+		Struct Alarm_t alarm = parseAlarmData(data)[0];
+
+		//EDIT alarm in alarm.c from above object
+		//use ID field in alarm[i] to edit which one
+
+	} 
+	else if (isUdpThisCommand(udpCommand, COMMAND_DELETE_ALARM)) {
+		data = extractPacketData(udpCommand);
+		Struct Alarm_t alarm = parseAlarmData(data)[0];
+
+		//DELETE alarm using id from above object
 
 	} 
 }
