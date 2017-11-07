@@ -30,8 +30,8 @@ CFLAGS = -Wall -g -c -std=c99 -D _POSIX_C_SOURCE=200809L -Werror -pthread
 CPPFLAGS = -Wall -g -D _POSIX_C_SOURCE=200809L -std=c++11
 
 
-all: init lcd nodeserver
-
+all: init lcd nodeserver wave
+	
 lcd: $(CPP_OBJ) $(C_OBJ)
 	$(CC_CPP) $(CPPFLAGS) $(IFLAGS) $(CPP_OBJ) $(C_OBJ) $(SRC_DIR)/i2c-dev.h -o $(OUTDIR)/$(TARGET) $(LFLAGS)
 	
@@ -47,6 +47,13 @@ $(OBJDIR)/%.o: $(SRC_DIR)/%.c
 nodeserver:
 		mkdir -p $(PUBDIR)/$(NODEDIR)-copy
 		cp -R $(NODEDIR)/* $(PUBDIR)/$(NODEDIR)-copy
+
+wave:
+	mkdir -p $(OUTDIR)/wave-files/
+	cp wave-files/* $(OUTDIR)/wave-files/ 
+	mkdir -p $(OUTDIR)/questions/
+	cp questions/* $(OUTDIR)/questions/ 
+
 
 clean:
 	rm -f $(OUTDIR)/$(TARGET)

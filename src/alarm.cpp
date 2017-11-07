@@ -7,11 +7,14 @@
 #include <pthread.h>
 #include <mutex>
 #include <string>
+#include <fstream>
+#include "json.hpp"
 extern "C" {
 	#include "deviceread.h"
 	#include "utils.h"
 }
-
+using namespace std;
+using json = nlohmann::json;
 // beep-06 wave file are taken from "https://www.soundjay.com/beep-sounds-1.html"
 #define SOURCE_FILE "wave-files/beep-06.wav"
 #define UPJOYSTICK "/sys/class/gpio/gpio26/value"
@@ -21,7 +24,6 @@ extern "C" {
 #define NUM_CHANNELS  1
 #define SAMPLE_SIZE   (sizeof(short))
 #define ALARM_SIZE 20
-using namespace std;
 
 static pthread_t alarm_thread;
 static pthread_t display_time_thread;
@@ -364,6 +366,11 @@ void testUser() {
 	char question[16];
 	bool answered = false;
 	int answer = 0;
+	std::ifstream i("questions/easy.json");
+	json j;
+	i >> j;
+	// std::cout << j.dump() << std::endl;
+
 	if(difficulty == 0) {
 		int questionType = rand() % 2;
 		int arg1, arg2;
