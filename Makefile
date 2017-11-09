@@ -5,7 +5,7 @@ SRC_DIR= src
 
 CPP_SOURCES= main.cpp I2CIO.cpp LCD.cpp LiquidCrystal_I2C.cpp alarm.cpp udp.cpp
 	   	     
-C_SOURCES = utils.c deviceread.c keypad.c
+C_SOURCES = utils.c deviceread.c keypad.c audioMixer.c
 
 OBJDIR = build
 
