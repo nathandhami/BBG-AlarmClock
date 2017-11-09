@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <pthread.h>
-#include <alsa/asoundlib.h>
 
 #ifndef ALARM_H
 #define ALARM_H

@@ -51,6 +51,7 @@ nodeserver:
 wave:
 	mkdir -p $(OUTDIR)/wave-files/
 	cp wave-files/* $(OUTDIR)/wave-files/ 
+	chmod a+rw $(OUTDIR)/wave-files/ 
 	mkdir -p $(OUTDIR)/questions/
 	cp questions/* $(OUTDIR)/questions/ 
 

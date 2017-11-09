@@ -28,6 +28,7 @@ static pthread_t display_time_thread;
 static int size;
 static Alarm_t alarm_clock[ALARM_SIZE];
 static wavedata_t alarm_sound;
+static wavedata_t question;
 
 static const char * months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 static const char * days[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -57,6 +58,7 @@ static void testUser();
 
 static void beep();
 static _Bool stopAlarm();
+static void questionInit(char* problem);
 
 void waitDelay(long sec, long nanoSec){
 	long seconds = sec;
@@ -79,10 +81,6 @@ void Alarm_startProgram(){
 	size = 0;
 	AudioMixer_init();
 	AudioMixer_readWaveFileIntoMemory(BEEP_FILE, &alarm_sound);
-	_Bool day[7] = {true,true,true,true,true,true,true};
-	Alarm_addAlarm(16,10,0,true,day);
-	Alarm_getAlarm();
-	//AudioMixer_queueSound(&alarm_sound);
 
 	int thread1 = pthread_create(&alarm_thread, NULL, alarmThread, (void *)0);
 	if(thread1 != 0){
@@ -145,6 +143,17 @@ _Bool stopAlarm(){
 
 	fclose(up_joystick);
 	return is_pressed;
+}
+
+// Text to speech function
+// queue the sound at different places
+// free the file before going into the question by using AudioMixer_freeWaveFileData
+void questionInit(char* problem){
+	char* command = (char*) malloc(1024*sizeof(char));
+	int length = sprintf(command,"pico2wave -w wave-files/question.wav \"%s\"",problem);
+	command[length] = '\0';
+	system(command);
+	AudioMixer_readWaveFileIntoMemory("wave-files/question.wav", &question);
 }
 
 //function to add alarm

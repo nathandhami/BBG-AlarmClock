@@ -3,13 +3,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <pthread.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <time.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <linux/i2c.h>
-#include <linux/i2c-dev.h>
 
 // Playback sounds in real time, allowing multiple simultaneous wave files
 // to be mixed together and played without jitter.

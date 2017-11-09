@@ -50,8 +50,6 @@ void AudioMixer_init(void)
 	AudioMixer_setVolume(DEFAULT_VOLUME);
 
 	// Initialize the currently active sound-bites being played
-	// REVISIT:- Implement this. Hint: set the pSound pointer to NULL for each
-	//     sound bite.
 	for(int i = 0; i<MAX_SOUND_BITES; i++){
 		soundBites[i].pSound = NULL;
 		soundBites[i].location = 0;
@@ -173,9 +171,6 @@ void AudioMixer_cleanup(void)
 	snd_pcm_close(handle);
 
 	// Free playback buffer
-	// (note that any wave files read into wavedata_t records must be freed
-	//  in addition to this by calling AudioMixer_freeWaveFileData() on that struct.)
-
 	free(playbackBuffer);
 	playbackBuffer = NULL;
 
@@ -186,8 +181,7 @@ void AudioMixer_cleanup(void)
 
 int AudioMixer_getVolume()
 {
-	// Return the cached volume; good enough unless someone is changing
-	// the volume through other means and the cached value is out of date.
+	// Return the cached volume;
 	return volume;
 }
 
