@@ -1,10 +1,8 @@
 #include "alarm.h"
 #include "LiquidCrystal_I2C.h"
-#include <stdio.h>
 #include <ctime>
 #include <chrono>
 #include <iostream>
-#include <pthread.h>
 #include <mutex>
 #include <string>
 #include <fstream>
@@ -81,6 +79,8 @@ void Alarm_startProgram(){
 	size = 0;
 	AudioMixer_init();
 	AudioMixer_readWaveFileIntoMemory(BEEP_FILE, &alarm_sound);
+	beep();
+
 
 	int thread1 = pthread_create(&alarm_thread, NULL, alarmThread, (void *)0);
 	if(thread1 != 0){
@@ -119,7 +119,7 @@ void beep(){
 		if(stopAlarm()){
 			alarmBeeping = true;
 		}
-		waitDelay(1,0);
+		waitDelay(0,700000000);
 	}
 }
 
@@ -147,21 +147,22 @@ _Bool stopAlarm(){
 
 // Text to speech function
 // queue the sound at different places
-// free the file before going into the question by using AudioMixer_freeWaveFileData
 void questionInit(char* problem){
 	char* command = (char*) malloc(1024*sizeof(char));
 	int length = sprintf(command,"pico2wave -w wave-files/question.wav \"%s\"",problem);
 	command[length] = '\0';
 	system(command);
 	AudioMixer_readWaveFileIntoMemory("wave-files/question.wav", &question);
+	free(command);
 }
 
 //function to add alarm
-void Alarm_addAlarm(int hour, int minute, int ids, _Bool stats, _Bool day[7]){
+void Alarm_addAlarm(int hour, int minute, int ids, int diff, _Bool stats, _Bool day[7]){
 	if((hour>=0 && hour<=24) && (minute>=0 && minute<=59)){
 		alarm_clock[size].hours = hour;
 		alarm_clock[size].minutes = minute;
 		alarm_clock[size].id = ids;
+		alarm_clock[size].difficulty = diff;
 		alarm_clock[size].status = stats;
 		for(int i = 0; i < 7; i++){
 			alarm_clock[size].days[i] = day[i];
@@ -171,10 +172,10 @@ void Alarm_addAlarm(int hour, int minute, int ids, _Bool stats, _Bool day[7]){
 }
 
 //function to edit alarm (not yet used)
-void Alarm_editAlarm(int hour, int minute, int ids, _Bool stats, _Bool day[7]){
+void Alarm_editAlarm(int hour, int minute, int ids, int diff, _Bool stats, _Bool day[7]){
 	_Bool found = false;
 	int i = -1;
-	while(i < size && !found){
+	while(i < size-1 && !found){
 		i++;
 		if(alarm_clock[i].id == ids){
 			found = true;
@@ -184,6 +185,7 @@ void Alarm_editAlarm(int hour, int minute, int ids, _Bool stats, _Bool day[7]){
 		alarm_clock[i].hours = hour;
 		alarm_clock[i].minutes = minute;
 		alarm_clock[i].status = stats;
+		alarm_clock[i].difficulty = diff;
 		for(int j = 0; j < 7; j++){
 			alarm_clock[i].days[j] = day[j];
 		}
@@ -197,21 +199,20 @@ void Alarm_editAlarm(int hour, int minute, int ids, _Bool stats, _Bool day[7]){
 void Alarm_deleteAlarm(int ids){
 	_Bool found = false;
 	int i = -1;
-	while(i < size && !found){
+	while(i < size-1 && !found){
 		i++;
 		if(alarm_clock[i].id == ids){
 			found = true;
 		}
 	}
 	if(found){
-		while(i < size-1){
-			alarm_clock[i].hours = alarm_clock[i+1].hours;
-			alarm_clock[i].minutes = alarm_clock[i+1].minutes;
-			alarm_clock[i].id = alarm_clock[i+1].id;
-			alarm_clock[i].status = alarm_clock[i+1].status;
-			for(int j = 0; j < 7; j++){
-				alarm_clock[i].days[j] = alarm_clock[i+1].days[j];
-			}
+		alarm_clock[i].hours = alarm_clock[size-1].hours;
+		alarm_clock[i].minutes = alarm_clock[size-1].minutes;
+		alarm_clock[i].id = alarm_clock[size-1].id;
+		alarm_clock[i].difficulty = alarm_clock[size-1].difficulty;
+		alarm_clock[i].status = alarm_clock[size-1].status;
+		for(int j = 0; j < 7; j++){
+			alarm_clock[i].days[j] = alarm_clock[size-1].days[j];
 		}
 		size--;	
 	}
@@ -225,7 +226,7 @@ void Alarm_deleteAlarm(int ids){
 //function to get all alarm that's been added
 void Alarm_getAlarm(){
 	for(int i = 0; i < size; i++){
-		printf("%d.  %.02d:%.02d %d, %d\n" ,i+1,alarm_clock[i].hours,alarm_clock[i].minutes, alarm_clock[i].status, alarm_clock[i].days[4]);
+		printf("%d.  %.02d:%.02d %d, %d, %d, %d\n" ,i+1,alarm_clock[i].hours,alarm_clock[i].minutes, alarm_clock[i].id, alarm_clock[i].difficulty, alarm_clock[i].status, size);
 	}
 	
 }
