@@ -301,7 +301,7 @@ static void playSentence() {
 
 void testUser() {
 	lcd_mutex.lock();
-	int difficulty = 0;
+	int difficulty = 1;
 	char question[512];
 	bool answered = false;
 	int questionType = 0;
@@ -311,10 +311,19 @@ void testUser() {
 	if(questionType == 0) {
 		//read questions from json
 		json questions;
-		
-		std::ifstream stream("questions/easy.json");
-		stream >> questions;
+
+		if(difficulty == 0) {
+			std::ifstream stream("questions/easy.json");
+			stream >> questions;
+		} else if(difficulty == 1) {
+			std::ifstream stream("questions/medium.json");
+			stream >> questions;
+		} else if(difficulty == 2) {
+			std::ifstream stream("questions/hard.json");
+			stream >> questions;
+		}
 		questions = questions.at("results");
+
 
 		//pick a random question
 		json questionJson;
@@ -440,7 +449,7 @@ void testUser() {
 			int questionSubType = rand() % 2;
 			int arg1, arg2;
 			if(questionSubType == 0) {
-				arg1 = rand() % 999 + 1;
+				arg1 = rand() % 100 + 1;
 				arg2 = rand() % 100 + 1;
 				answer = arg1 + arg2;
 				sprintf (question, "%d + %d =", arg1, arg2);
@@ -453,8 +462,36 @@ void testUser() {
 			}
 
 		} else if(difficulty == 1) {
+			int questionSubType = rand() % 2;
+			int arg1, arg2;
+			if(questionSubType == 0) {
+				arg1 = rand() % 999 + 1;
+				arg2 = rand() % 100 + 1;
+				answer = arg1 + arg2;
+				sprintf (question, "%d + %d =", arg1, arg2);
+
+			} else if(questionSubType == 1) {
+				arg1 = rand() % 12 + 1;
+				arg2 = rand() % 99 + 1;
+				answer = arg1 * arg2;
+				sprintf (question, "%d x %d =", arg1, arg2);
+			}
 
 		} else if(difficulty == 2) {
+			int questionSubType = rand() % 2;
+			int arg1, arg2;
+			if(questionSubType == 0) {
+				arg1 = rand() % 999 + 1;
+				arg2 = rand() % 999 + 1;
+				answer = arg1 + arg2;
+				sprintf (question, "%d + %d =", arg1, arg2);
+
+			} else if(questionSubType == 1) {
+				arg1 = rand() % 99 + 1;
+				arg2 = rand() % 99 + 1;
+				answer = arg1 * arg2;
+				sprintf (question, "%d x %d =", arg1, arg2);
+			}
 
 		}
 		lcd.clear();
