@@ -51,8 +51,8 @@ static void *readingInputs(void *arg)
 		if (isRowActive == true) {
 			pressed = Keypad_keyPressed(KEYPAD_ROW_1, currentColumn);
 			nothingPressed = false;
-			printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_1, currentColumn,
-					pressed);
+			// printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_1, currentColumn,
+			// 		pressed);
 			usleep(DEBOUNCER_TIME);
 		}
 
@@ -61,8 +61,8 @@ static void *readingInputs(void *arg)
 		if (isRowActive == true) {
 			pressed = Keypad_keyPressed(KEYPAD_ROW_2, currentColumn);
 			nothingPressed = false;
-			printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_2,currentColumn,
-					pressed);
+			// printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_2,currentColumn,
+			// 		pressed);
 			usleep(DEBOUNCER_TIME);
 		}
 		isRowActive = Keypad_readRow(KEYPAD_ROW_3);
@@ -70,8 +70,8 @@ static void *readingInputs(void *arg)
 		if (isRowActive == true) {
 			pressed = Keypad_keyPressed(KEYPAD_ROW_3, currentColumn);
 			nothingPressed = false;
-			printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_3, currentColumn,
-					pressed);
+			// printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_3, currentColumn,
+			// 		pressed);
 			usleep(DEBOUNCER_TIME);
 		}
 		isRowActive = Keypad_readRow(KEYPAD_ROW_4);
@@ -79,8 +79,8 @@ static void *readingInputs(void *arg)
 		if (isRowActive == true) {
 			pressed = Keypad_keyPressed(KEYPAD_ROW_4, currentColumn);
 			nothingPressed = false;
-			printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_4, currentColumn,
-					pressed);
+			// printf("user pressed row %d, col %d: %c\n", KEYPAD_ROW_4, currentColumn,
+			// 		pressed);
 			usleep(DEBOUNCER_TIME);
 		}
 
@@ -94,7 +94,7 @@ static void *readingInputs(void *arg)
 		}
 
 		if(nothingPressed) {
-			pressed = 'x';
+			pressed = ' ';
 		}
 	}
 

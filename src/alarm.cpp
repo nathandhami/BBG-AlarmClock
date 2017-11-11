@@ -302,15 +302,17 @@ static void playSentence() {
 void testUser() {
 	lcd_mutex.lock();
 	int difficulty = 0;
-	char question[256];
+	char question[512];
 	bool answered = false;
 	int questionType = 0;
+	bool pressedWrong = false;
 
 	//mutiple choice
 	if(questionType == 0) {
 		//read questions from json
-		std::ifstream stream("questions/easy.json");
 		json questions;
+		
+		std::ifstream stream("questions/easy.json");
 		stream >> questions;
 		questions = questions.at("results");
 
@@ -331,6 +333,7 @@ void testUser() {
 		question[0] = ' ';
 		question[strlen(question) - 1] = ' ';
 		int answerNumber;
+		char answerChar;
 		char answerBuffer[256];
 		string answerArray[4];
 
@@ -343,9 +346,23 @@ void testUser() {
 		if(questionSubType.compare("boolean") == 0) {
 			answerNumber = rand() % 2;
 			answerArray[answerNumber] = tempAnswer;
+			if(answerNumber == 0) {
+				answerChar = 'A';
+			} else {
+				answerChar = 'B';
+			}
 		} else if(questionSubType.compare("multiple") == 0) {
 			answerNumber = rand() % 4;
 			answerArray[answerNumber] = tempAnswer;
+			if(answerNumber == 0) {
+				answerChar = 'A';
+			} else if(answerNumber == 1) {
+				answerChar = 'B';
+			} else if(answerNumber == 2) {
+				answerChar = 'C';
+			} else {
+				answerChar = 'D';
+			}
 		}
 
 		//read incorrect answers, assgin letters
@@ -380,31 +397,41 @@ void testUser() {
 		
 		
 		speechInit(question, &questionWave);
-		// AudioMixer_queueSound(&questionWave);
 		speechInit(answerBuffer, &answerWave);
-		// AudioMixer_queueSound(&answerWave);
 		sprintf(question, "%s, %s", question, answerBuffer);
 		speechInit(question, &questionAndAnswerWave);
 		AudioMixer_queueSound(&questionAndAnswerWave);
-		lcd.clear();
 		
-
+		//prepare lcd
+		lcd.clear();
 		lcd.setCursor(0, 0);
 		lcd.print("up: repeat qustn");
 		lcd.setCursor(0, 1);
 		lcd.print("dwn: repeat ansr");
 
+		
 		while(!answered) {
 			char pressed = getPressed();
 			if(checkUp()) {
 				AudioMixer_queueSound(&questionWave);
 			} else if(checkDown()) {
 				AudioMixer_queueSound(&answerWave);
+			} else if(pressed != ' ') {
+				answered = true;
+				if(pressed != answerChar) {
+					pressedWrong = true;
+					lcd.clear();
+					lcd.print("WRONG!");
+					waitDelay(0, 900000000);
+				}
 			}
 			waitDelay(0, 400000000);
 		}
-		sleep(10);
 		lcd.clear();
+		AudioMixer_freeWaveFileData(&questionWave);
+		AudioMixer_freeWaveFileData(&answerWave);
+		AudioMixer_freeWaveFileData(&questionAndAnswerWave);
+
 
 	//Arithmatic
 	} else {
@@ -443,7 +470,7 @@ void testUser() {
 		string enteredAnswer = "";
 		while(!answered) {
 			char pressed = getPressed();
-			if(pressed != 'x') {
+			if(pressed != ' ') {
 				lcd.write(pressed);
 				enteredAnswer.push_back(pressed);
 				if(pressed == '*') {
@@ -469,7 +496,11 @@ void testUser() {
 		}
 	}
 	lcd.noBlink();
+	lcd.noCursor();
 	lcd_mutex.unlock();
+	if(pressedWrong) {
+		testUser();
+	}
 }
 
 _Bool checkUp(){
