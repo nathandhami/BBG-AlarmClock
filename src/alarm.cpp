@@ -363,71 +363,148 @@ void* displayTimeThread(void*){
 void testUser() {
 	lcd_mutex.lock();
 	int difficulty = 0;
-	char question[16];
+	char question[256];
 	bool answered = false;
-	int answer = 0;
-	std::ifstream i("questions/easy.json");
-	json j;
-	i >> j;
-	// std::cout << j.dump() << std::endl;
+	int questionType = 0;
 
-	if(difficulty == 0) {
-		int questionType = rand() % 2;
-		int arg1, arg2;
-		if(questionType == 0) {
-			arg1 = rand() % 100 + 1;
-			arg2 = rand() % 100 + 1;
-			answer = arg1 + arg2;
-			sprintf (question, "%d + %d =", arg1, arg2);
+	//mutiple choice
+	if(questionType == 0) {
+		std::ifstream stream("questions/easy.json");
+		json questions;
+		stream >> questions;
+		questions = questions.at("results");
+		json questionJson;
+		int questionNumber = rand() % questions.size();
+		int index = 0;
 
-		} if(questionType == 1) {
-			arg1 = rand() % 10 + 1;
-			arg2 = rand() % 10 + 1;
-			answer = arg1 * arg2;
-			sprintf (question, "%d x %d =", arg1, arg2);
+		for (auto& element : questions) {
+			if(index == questionNumber) {
+				questionJson = element;
+				break;
+			}
+			index++;
 		}
-
-	} else if(difficulty == 1) {
-
-	} else if(difficulty == 2) {
-
-	}
-	lcd.clear();
-	lcd.setCursor(0, 0);
-	lcd.print(question);
-	lcd.setCursor(0, 1);
-	lcd.cursor();
-	lcd.blink();
-
-	char s[32];
-
-	int len = sprintf(s, "%d", answer);
-	string enteredAnswer = "";
-	while(!answered) {
-		char pressed = getPressed();
-		if(pressed != 'x') {
-			lcd.write(pressed);
-			enteredAnswer.push_back(pressed);
-			if(pressed == '*') {
-				enteredAnswer.pop_back();
-				if(stoi(enteredAnswer) == answer) {
-					lcd.clear();
-					lcd.print("correct");
-					answered = true;
+		// std::cout << questionJson.at("question").dump() << '\n';
+		string questionSubType = questionJson.at("type");
+		sprintf(question, "%s", questionJson.at("question").dump().c_str());
+		printf("%s\n", question);
+		int answerNumber;
+		char answerBuffer[256];
+		string answerArray[4];
+		if(questionSubType.compare("boolean") == 0) {
+			answerNumber = rand() % 2;
+			answerArray[answerNumber] = questionJson.at("correct_answer").dump().c_str();
+		} else if(questionSubType.compare("multiple") == 0) {
+			answerNumber = rand() % 4;
+			answerArray[answerNumber] = questionJson.at("correct_answer").dump().c_str();
+		}
+		json incorrectAnswers = questionJson.at("incorrect_answers");
+		index = 0;
+		for (auto& element : incorrectAnswers) {
+			bool entered = false;
+			while(!entered) {
+				if(answerArray[index].empty()) {
+					answerArray[index] = element.dump().c_str();
+					entered = true;
 				} else {
-					enteredAnswer.clear();
-					lcd.clear();
-					lcd.setCursor(0, 0);
-					lcd.print(question);
-					lcd.setCursor(0, 1);
-					lcd.cursor();
-					lcd.blink();
+					index++;
 				}
 			}
 		}
+		if(questionSubType.compare("boolean") == 0) {
+			sprintf(answerBuffer, "A. %s, B. %s", answerArray[0].c_str(), answerArray[1].c_str());
+		} else if(questionSubType.compare("multiple") == 0) {
+			sprintf(answerBuffer, "A. %s, B. %s, C. %s, D. %s", answerArray[0].c_str(), answerArray[1].c_str(), answerArray[2].c_str(), answerArray[3].c_str());
+		}
+		printf("%s\n", answerBuffer);
+		lcd.clear();
+		
+		lcd.autoscroll();
+		// lcd.print(question);
+		// lcd.setCursor(0, 1);
+		lcd.setCursor(0, 0);
+		for(int i = 0; (i <  strlen(question)); i++) {
+				// printf("%c\n", question[i]);
+				usleep(60000);
+				lcd.write(question[i]);
+				if (i % 8==0)
+					sleep(1);
+				// if(i < strlen(question)) {
+				// 	lcd.write(question[i]);
+				// }
+				// lcd.setCursor(0, 1);
+				// if(i < strlen(answerBuffer)) {
+				// 	lcd.write(answerBuffer[i]);
+				// }
 
-		waitDelay(0, 400000000);
+			}
+		// while(!answered) {
+		// 	waitDelay(0, 400000000);
+		// }
+		sleep(10);
+		lcd.clear();
 
+	//Arithmatic
+	} else {
+		int answer = 0;
+		if(difficulty == 0) {
+			int questionSubType = rand() % 2;
+			int arg1, arg2;
+			if(questionSubType == 0) {
+				arg1 = rand() % 100 + 1;
+				arg2 = rand() % 100 + 1;
+				answer = arg1 + arg2;
+				sprintf (question, "%d + %d =", arg1, arg2);
+
+			} else if(questionSubType == 1) {
+				arg1 = rand() % 10 + 1;
+				arg2 = rand() % 10 + 1;
+				answer = arg1 * arg2;
+				sprintf (question, "%d x %d =", arg1, arg2);
+			}
+
+		} else if(difficulty == 1) {
+
+		} else if(difficulty == 2) {
+
+		}
+		lcd.clear();
+		lcd.setCursor(0, 0);
+		lcd.print(question);
+		lcd.setCursor(0, 1);
+		lcd.cursor();
+		lcd.blink();
+
+		char s[32];
+
+		sprintf(s, "%d", answer);
+		string enteredAnswer = "";
+		while(!answered) {
+			char pressed = getPressed();
+			if(pressed != 'x') {
+				lcd.write(pressed);
+				enteredAnswer.push_back(pressed);
+				if(pressed == '*') {
+					enteredAnswer.pop_back();
+					if(stoi(enteredAnswer) == answer) {
+						lcd.clear();
+						lcd.print("correct");
+						answered = true;
+					} else {
+						enteredAnswer.clear();
+						lcd.clear();
+						lcd.setCursor(0, 0);
+						lcd.print(question);
+						lcd.setCursor(0, 1);
+						lcd.cursor();
+						lcd.blink();
+					}
+				}
+			}
+
+			waitDelay(0, 400000000);
+
+		}
 	}
 	lcd.noBlink();
 	lcd_mutex.unlock();
