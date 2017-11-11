@@ -17,6 +17,7 @@ using json = nlohmann::json;
 // beep-06 wave file are taken from "https://www.soundjay.com/beep-sounds-1.html"
 #define BEEP_FILE "wave-files/beep-06.wav"
 #define UPJOYSTICK "/sys/class/gpio/gpio26/value"
+#define DOWNJOYSTICK "/sys/class/gpio/gpio46/value"
 #define EXPORTFILE "/sys/class/gpio/export"
 
 #define ALARM_SIZE 12
@@ -26,7 +27,9 @@ static pthread_t display_time_thread;
 static int size;
 static Alarm_t alarm_clock[ALARM_SIZE];
 static wavedata_t alarm_sound;
-static wavedata_t question;
+static wavedata_t questionAndAnswerWave;
+static wavedata_t questionWave;
+static wavedata_t answerWave;
 
 static const char * months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 static const char * days[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -53,10 +56,11 @@ static void* displayTimeThread(void*);
 static void* alarmThread(void*);
 static void writeToFile(char *fileName, char* value);
 static void testUser();
-
+static _Bool checkUp();
+static _Bool checkDown();
 static void beep();
 static _Bool stopAlarm();
-static void questionInit(char* problem);
+static void speechInit(const char* problem, wavedata_t* file);
 
 void waitDelay(long sec, long nanoSec){
 	long seconds = sec;
@@ -75,11 +79,12 @@ void Alarm_startProgram(){
 	DeviceRead_startReading();
 	//opening upjoystick file to stop alarm (temporary)
 	writeToFile(EXPORTFILE,"26");
+	writeToFile(EXPORTFILE,"46");
 	//size of the alarm
 	size = 0;
 	AudioMixer_init();
 	AudioMixer_readWaveFileIntoMemory(BEEP_FILE, &alarm_sound);
-	beep();
+	// beep();
 
 
 	int thread1 = pthread_create(&alarm_thread, NULL, alarmThread, (void *)0);
@@ -147,12 +152,12 @@ _Bool stopAlarm(){
 
 // Text to speech function
 // queue the sound at different places
-void questionInit(char* problem){
+void speechInit(const char* sentence, wavedata_t* file){
 	char* command = (char*) malloc(1024*sizeof(char));
-	int length = sprintf(command,"pico2wave -w wave-files/question.wav \"%s\"",problem);
+	int length = sprintf(command,"pico2wave -w wave-files/question.wav \"%s\"", sentence);
 	command[length] = '\0';
 	system(command);
-	AudioMixer_readWaveFileIntoMemory("wave-files/question.wav", &question);
+	AudioMixer_readWaveFileIntoMemory("wave-files/question.wav", file);
 	free(command);
 }
 
@@ -290,6 +295,10 @@ void* displayTimeThread(void*){
 	}
 }
 
+static void playSentence() {
+
+}
+
 void testUser() {
 	lcd_mutex.lock();
 	int difficulty = 0;
@@ -299,14 +308,16 @@ void testUser() {
 
 	//mutiple choice
 	if(questionType == 0) {
+		//read questions from json
 		std::ifstream stream("questions/easy.json");
 		json questions;
 		stream >> questions;
 		questions = questions.at("results");
+
+		//pick a random question
 		json questionJson;
 		int questionNumber = rand() % questions.size();
 		int index = 0;
-
 		for (auto& element : questions) {
 			if(index == questionNumber) {
 				questionJson = element;
@@ -314,63 +325,84 @@ void testUser() {
 			}
 			index++;
 		}
-		// std::cout << questionJson.at("question").dump() << '\n';
-		string questionSubType = questionJson.at("type");
+
+		//read question, remove quotes
 		sprintf(question, "%s", questionJson.at("question").dump().c_str());
-		printf("%s\n", question);
+		question[0] = ' ';
+		question[strlen(question) - 1] = ' ';
 		int answerNumber;
 		char answerBuffer[256];
 		string answerArray[4];
+
+		//read correct answer, remove quotes
+		string tempAnswer = questionJson.at("correct_answer").dump();
+		tempAnswer.erase(remove( tempAnswer.begin(), tempAnswer.end(), '\"' ),tempAnswer.end());
+
+		//assigne letters to correct answer
+		string questionSubType = questionJson.at("type");
 		if(questionSubType.compare("boolean") == 0) {
 			answerNumber = rand() % 2;
-			answerArray[answerNumber] = questionJson.at("correct_answer").dump().c_str();
+			answerArray[answerNumber] = tempAnswer;
 		} else if(questionSubType.compare("multiple") == 0) {
 			answerNumber = rand() % 4;
-			answerArray[answerNumber] = questionJson.at("correct_answer").dump().c_str();
+			answerArray[answerNumber] = tempAnswer;
 		}
+
+		//read incorrect answers, assgin letters
 		json incorrectAnswers = questionJson.at("incorrect_answers");
 		index = 0;
 		for (auto& element : incorrectAnswers) {
 			bool entered = false;
 			while(!entered) {
 				if(answerArray[index].empty()) {
-					answerArray[index] = element.dump().c_str();
+					string temp = element.dump();
+					temp.erase(remove( temp.begin(), temp.end(), '\"' ),temp.end());
+					answerArray[index] = temp;
 					entered = true;
 				} else {
 					index++;
 				}
 			}
 		}
+
+		//produce single string with all options
 		if(questionSubType.compare("boolean") == 0) {
 			sprintf(answerBuffer, "A. %s, B. %s", answerArray[0].c_str(), answerArray[1].c_str());
 		} else if(questionSubType.compare("multiple") == 0) {
 			sprintf(answerBuffer, "A. %s, B. %s, C. %s, D. %s", answerArray[0].c_str(), answerArray[1].c_str(), answerArray[2].c_str(), answerArray[3].c_str());
 		}
+
+
+		// string questionString(question);
+		printf("%s\n", question);
+		// questionString.erase(remove( questionString.begin(), questionString.end(), '\"' ),questionString.end());
 		printf("%s\n", answerBuffer);
+		
+		
+		speechInit(question, &questionWave);
+		// AudioMixer_queueSound(&questionWave);
+		speechInit(answerBuffer, &answerWave);
+		// AudioMixer_queueSound(&answerWave);
+		sprintf(question, "%s, %s", question, answerBuffer);
+		speechInit(question, &questionAndAnswerWave);
+		AudioMixer_queueSound(&questionAndAnswerWave);
 		lcd.clear();
 		
-		lcd.autoscroll();
-		// lcd.print(question);
-		// lcd.setCursor(0, 1);
-		lcd.setCursor(0, 0);
-		for(int i = 0; (i <  strlen(question)); i++) {
-				// printf("%c\n", question[i]);
-				usleep(60000);
-				lcd.write(question[i]);
-				if (i % 8==0)
-					sleep(1);
-				// if(i < strlen(question)) {
-				// 	lcd.write(question[i]);
-				// }
-				// lcd.setCursor(0, 1);
-				// if(i < strlen(answerBuffer)) {
-				// 	lcd.write(answerBuffer[i]);
-				// }
 
+		lcd.setCursor(0, 0);
+		lcd.print("up: repeat qustn");
+		lcd.setCursor(0, 1);
+		lcd.print("dwn: repeat ansr");
+
+		while(!answered) {
+			char pressed = getPressed();
+			if(checkUp()) {
+				AudioMixer_queueSound(&questionWave);
+			} else if(checkDown()) {
+				AudioMixer_queueSound(&answerWave);
 			}
-		// while(!answered) {
-		// 	waitDelay(0, 400000000);
-		// }
+			waitDelay(0, 400000000);
+		}
 		sleep(10);
 		lcd.clear();
 
@@ -381,14 +413,14 @@ void testUser() {
 			int questionSubType = rand() % 2;
 			int arg1, arg2;
 			if(questionSubType == 0) {
-				arg1 = rand() % 100 + 1;
+				arg1 = rand() % 999 + 1;
 				arg2 = rand() % 100 + 1;
 				answer = arg1 + arg2;
 				sprintf (question, "%d + %d =", arg1, arg2);
 
 			} else if(questionSubType == 1) {
-				arg1 = rand() % 10 + 1;
-				arg2 = rand() % 10 + 1;
+				arg1 = rand() % 12 + 1;
+				arg2 = rand() % 12 + 1;
 				answer = arg1 * arg2;
 				sprintf (question, "%d x %d =", arg1, arg2);
 			}
@@ -438,4 +470,44 @@ void testUser() {
 	}
 	lcd.noBlink();
 	lcd_mutex.unlock();
+}
+
+_Bool checkUp(){
+	FILE *up_joystick = fopen(UPJOYSTICK, "r");
+	_Bool is_pressed = false;
+	if(up_joystick == NULL){
+		printf("ERROR: cannot read up joystick file");
+		exit(-1);
+	}
+	const int max_length = 1024;
+	char buff[max_length];
+	fgets(buff, max_length, up_joystick);
+
+	//up is pressed
+	if(atoi(buff) == 0){
+		is_pressed = true;
+	}
+
+	fclose(up_joystick);
+	return is_pressed;
+}
+
+_Bool checkDown(){
+	FILE *up_joystick = fopen(DOWNJOYSTICK, "r");
+	_Bool is_pressed = false;
+	if(up_joystick == NULL){
+		printf("ERROR: cannot read up joystick file");
+		exit(-1);
+	}
+	const int max_length = 1024;
+	char buff[max_length];
+	fgets(buff, max_length, up_joystick);
+
+	//up is pressed
+	if(atoi(buff) == 0){
+		is_pressed = true;
+	}
+
+	fclose(up_joystick);
+	return is_pressed;
 }
