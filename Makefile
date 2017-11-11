@@ -5,7 +5,7 @@ SRC_DIR= src
 
 CPP_SOURCES= main.cpp I2CIO.cpp LCD.cpp LiquidCrystal_I2C.cpp alarm.cpp udp.cpp
 	   	     
-C_SOURCES = utils.c deviceread.c keypad.c
+C_SOURCES = utils.c deviceread.c keypad.c audioMixer.c
 
 OBJDIR = build
 
@@ -51,6 +51,7 @@ nodeserver:
 wave:
 	mkdir -p $(OUTDIR)/wave-files/
 	cp wave-files/* $(OUTDIR)/wave-files/ 
+	chmod a+rw $(OUTDIR)/wave-files/ 
 	mkdir -p $(OUTDIR)/questions/
 	cp questions/* $(OUTDIR)/questions/ 
 

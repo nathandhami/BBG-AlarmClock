@@ -2,7 +2,7 @@
 #include "alarm.h"
 
 int main (int argc, char *argv []) {
-	startProgram();
+	Alarm_startProgram();
 	UDP_startServer();
 
 
