@@ -11,14 +11,12 @@ extern "C" {
 	#include "deviceread.h"
 	#include "utils.h"
 	#include "audioMixer.h"
+	#include "joystick.h"
 }
 using namespace std;
 using json = nlohmann::json;
 // beep-06 wave file are taken from "https://www.soundjay.com/beep-sounds-1.html"
 #define BEEP_FILE "wave-files/beep-06.wav"
-#define UPJOYSTICK "/sys/class/gpio/gpio26/value"
-#define DOWNJOYSTICK "/sys/class/gpio/gpio46/value"
-#define EXPORTFILE "/sys/class/gpio/export"
 
 #define ALARM_SIZE 12
 
@@ -54,10 +52,7 @@ static mutex lcd_mutex;
 
 static void* displayTimeThread(void*);
 static void* alarmThread(void*);
-static void writeToFile(char *fileName, char* value);
 static void testUser();
-static _Bool checkUp();
-static _Bool checkDown();
 static void beep();
 static _Bool stopAlarm();
 static void speechInit(const char* problem, wavedata_t* file);
@@ -78,8 +73,7 @@ void Alarm_startProgram(){
 	srand (time(NULL));
 	DeviceRead_startReading();
 	//opening upjoystick file to stop alarm (temporary)
-	writeToFile(EXPORTFILE,"26");
-	writeToFile(EXPORTFILE,"46");
+	Joystick_init();
 	//size of the alarm
 	size = 0;
 	AudioMixer_init();
@@ -234,16 +228,6 @@ void Alarm_getAlarm(){
 		printf("%d.  %.02d:%.02d %d, %d, %d, %d\n" ,i+1,alarm_clock[i].hours,alarm_clock[i].minutes, alarm_clock[i].id, alarm_clock[i].difficulty, alarm_clock[i].status, size);
 	}
 	
-}
-
-void writeToFile(char *fileName, char* value){
-	FILE *file = fopen(fileName, "w");
-	if(file == NULL){
-		printf("Error: cannot open file.\n");
-		exit(1);
-	}
-	fprintf(file, "%s", value);
-	fclose(file);
 }
 
 void* alarmThread(void*) {
@@ -421,9 +405,9 @@ void testUser() {
 		
 		while(!answered) {
 			char pressed = getPressed();
-			if(checkUp()) {
+			if(Joystick_checkUp()) {
 				AudioMixer_queueSound(&questionWave);
-			} else if(checkDown()) {
+			} else if(Joystick_checkDown()) {
 				AudioMixer_queueSound(&answerWave);
 			} else if(pressed != ' ') {
 				answered = true;
@@ -538,44 +522,4 @@ void testUser() {
 	if(pressedWrong) {
 		testUser();
 	}
-}
-
-_Bool checkUp(){
-	FILE *up_joystick = fopen(UPJOYSTICK, "r");
-	_Bool is_pressed = false;
-	if(up_joystick == NULL){
-		printf("ERROR: cannot read up joystick file");
-		exit(-1);
-	}
-	const int max_length = 1024;
-	char buff[max_length];
-	fgets(buff, max_length, up_joystick);
-
-	//up is pressed
-	if(atoi(buff) == 0){
-		is_pressed = true;
-	}
-
-	fclose(up_joystick);
-	return is_pressed;
-}
-
-_Bool checkDown(){
-	FILE *up_joystick = fopen(DOWNJOYSTICK, "r");
-	_Bool is_pressed = false;
-	if(up_joystick == NULL){
-		printf("ERROR: cannot read up joystick file");
-		exit(-1);
-	}
-	const int max_length = 1024;
-	char buff[max_length];
-	fgets(buff, max_length, up_joystick);
-
-	//up is pressed
-	if(atoi(buff) == 0){
-		is_pressed = true;
-	}
-
-	fclose(up_joystick);
-	return is_pressed;
 }

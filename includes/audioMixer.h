@@ -24,7 +24,7 @@ void AudioMixer_cleanup(void);
 // Read the contents of a wave file into the pSound structure. Note that
 // the pData pointer in this structure will be dynamically allocated in
 // readWaveFileIntoMemory(), and is freed by calling freeWaveFileData().
-void AudioMixer_readWaveFileIntoMemory(char *fileName, wavedata_t *pSound);
+void AudioMixer_readWaveFileIntoMemory(const char *fileName, wavedata_t *pSound);
 void AudioMixer_freeWaveFileData(wavedata_t *pSound);
 
 // Queue up another sound bite to play as soon as possible.

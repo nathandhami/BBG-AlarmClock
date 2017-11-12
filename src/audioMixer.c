@@ -5,7 +5,9 @@
 #include <alsa/asoundlib.h>
 #include <limits.h>
 #include <alloca.h> // needed for mixer
+#include "utils.h"
 
+#define AUDIO_VIRTUAL_CAPE "BB-BONE-AUDI-02"
 
 static snd_pcm_t *handle;
 
@@ -47,10 +49,12 @@ static int volume = 0;
 
 void AudioMixer_init(void)
 {
+	Utils_loadVirtualCape(AUDIO_VIRTUAL_CAPE);
+
 	AudioMixer_setVolume(DEFAULT_VOLUME);
 
 	// Initialize the currently active sound-bites being played
-	for(int i = 0; i<MAX_SOUND_BITES; i++){
+	for(int i = 0; i< MAX_SOUND_BITES; i++){
 		soundBites[i].pSound = NULL;
 		soundBites[i].location = 0;
 	}
@@ -88,7 +92,7 @@ void AudioMixer_init(void)
 
 
 // Client code must call AudioMixer_freeWaveFileData to free dynamically allocated data.
-void AudioMixer_readWaveFileIntoMemory(char *fileName, wavedata_t *pSound)
+void AudioMixer_readWaveFileIntoMemory(const char *fileName, wavedata_t *pSound)
 {
 	assert(pSound);
 
