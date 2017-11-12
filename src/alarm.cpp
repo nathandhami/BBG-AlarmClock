@@ -125,23 +125,7 @@ void beep(){
 
 //stopping alarm by pressing up on the joystick (temporary)
 _Bool stopAlarm(){
-	FILE *up_joystick = fopen(UPJOYSTICK, "r");
-	_Bool is_pressed = false;
-	if(up_joystick == NULL){
-		printf("ERROR: cannot read up joystick file");
-		exit(-1);
-	}
-	const int max_length = 1024;
-	char buff[max_length];
-	fgets(buff, max_length, up_joystick);
-
-	//up is pressed
-	if(atoi(buff) == 0){
-		is_pressed = true;
-	}
-
-	fclose(up_joystick);
-	return is_pressed;
+	return Joystick_checkUp();
 }
 
 // Text to speech function
