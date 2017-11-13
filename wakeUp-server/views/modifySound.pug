@@ -1,0 +1,11 @@
+extends placeholders/header.pug
+block content
+    link(rel='stylesheet', type='text/css', href='/stylesheets/modifySound.css')
+    .container.offset-brah
+        form(ref="uploadForm", id="uploadForm", action="/alarmSound/set", method="post", encType="multipart/form-data")
+            h2 Use to change the alarm sound
+            label.btn.btn-default Browse
+                input(type="file" name="alarm_sound")
+            div
+                button(type="submit", value="Upload!") Set Sound
+//- script(type='text/javascript', src='javascripts/m.js')

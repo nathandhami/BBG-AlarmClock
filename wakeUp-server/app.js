@@ -8,8 +8,10 @@ var nconf = require('./src/nconf/nConfig');
 var mongoose = require('mongoose');
 var expressSession = require('express-session');
 var MongoStore = require('connect-mongo')(expressSession);
+const fileUpload = require('express-fileupload');
 
 var index = require('./routes/index');
+var modifySound = require('./routes/modifySound');
 
 var app = express();
 
@@ -39,6 +41,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(fileUpload());
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
@@ -49,6 +52,7 @@ socketClient.on('connect', function(data) {
 });
 app.set('socketClient', socketClient);
 
+app.use('/alarmSound', modifySound);
 app.use('/', index);
 
 // catch 404 and forward to error handler

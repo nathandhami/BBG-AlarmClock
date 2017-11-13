@@ -27,4 +27,6 @@ void Alarm_editAlarm(int hour, int minute, int ids, int diff, _Bool stats, _Bool
 void Alarm_deleteAlarm(int index);
 void Alarm_getAlarm();
 
+void Alarm_changeSound(const char *newSound);
+
 #endif

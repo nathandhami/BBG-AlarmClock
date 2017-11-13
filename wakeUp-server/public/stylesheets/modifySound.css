@@ -1,0 +1,10 @@
+html, body{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image:linear-gradient(#bc6969,#274e75);
+}
+
+.offset-brah {
+    margin-top: 100px;
+}

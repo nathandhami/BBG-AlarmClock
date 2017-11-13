@@ -25,6 +25,7 @@
 #define COMMAND_CREATE_ALARM	"createAlarm"
 #define COMMAND_EDIT_ALARM		"editAlarm"
 #define COMMAND_DELETE_ALARM	"deleteAlarm"
+#define COMMAND_CHANGE_SOUND    "changeSound"
 
 
 // This macro will retrieve the data from the UDP packet
@@ -152,7 +153,16 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 
 		//DELETE alarm using id from alarm object
 		Alarm_deleteAlarm(id);
-	} 
+	}
+	else if (isUdpThisCommand(udpCommand, COMMAND_CHANGE_SOUND)) {
+		data = extractPacketData(udpCommand);
+		int id;
+		if (data != NULL) {
+			//Change sound used for alarm
+			Alarm_changeSound(data);
+		}
+
+	}
 }
 
 static char *extractPacketData(char *buffer)

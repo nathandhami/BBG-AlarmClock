@@ -16,7 +16,10 @@ extern "C" {
 using namespace std;
 using json = nlohmann::json;
 // beep-06 wave file are taken from "https://www.soundjay.com/beep-sounds-1.html"
-#define BEEP_FILE "wave-files/beep-06.wav"
+#define ALARM_SOUND_FOLDER "wave-files/"
+#define BEEP_FILE ALARM_SOUND_FOLDER"beep-06.wav"
+static string soundFile = BEEP_FILE;
+
 
 #define ALARM_SIZE 12
 
@@ -77,7 +80,7 @@ void Alarm_startProgram(){
 	//size of the alarm
 	size = 0;
 	AudioMixer_init();
-	AudioMixer_readWaveFileIntoMemory(BEEP_FILE, &alarm_sound);
+	AudioMixer_readWaveFileIntoMemory(soundFile.c_str(), &alarm_sound);
 	// beep();
 
 
@@ -201,8 +204,6 @@ void Alarm_deleteAlarm(int ids){
 	else{
 		printf("Cannot find alarm with that id");
 	}
-
-	
 }
 
 //function to get all alarm that's been added
@@ -212,6 +213,26 @@ void Alarm_getAlarm(){
 	}
 	
 }
+
+void Alarm_changeSound(const char* newSound)
+{
+	soundFile = newSound;
+	soundFile = ALARM_SOUND_FOLDER + soundFile;
+	printf("%s %s\n", "New Sound file:", soundFile.c_str());
+
+	// Check if file exists
+	FILE *pFile = fopen(soundFile.c_str(), "r");
+	if (pFile == NULL){
+		printf("Error: could not change sound file %s\n", soundFile.c_str());
+		soundFile = BEEP_FILE;
+	}
+	else {
+		fclose(pFile);
+		AudioMixer_freeWaveFileData(&alarm_sound);
+		AudioMixer_readWaveFileIntoMemory(soundFile.c_str(), &alarm_sound);
+	}
+}
+
 
 void* alarmThread(void*) {
 	while(true) {
@@ -261,6 +282,7 @@ void* displayTimeThread(void*){
 		waitDelay(1, 0);
 	}
 }
+
 
 static void playSentence() {
 
