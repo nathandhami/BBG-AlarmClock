@@ -52,7 +52,7 @@ static mutex lcd_mutex;
 
 static void* displayTimeThread(void*);
 static void* alarmThread(void*);
-static void testUser();
+static void testUser(Alarm_t *alarm);
 static void beep();
 static _Bool stopAlarm();
 static void speechInit(const char* problem, wavedata_t* file);
@@ -103,9 +103,8 @@ void Alarm_endProgram(){
 //check if the alarm has to rang or not
 void checkAlarm(int hour, int minute, int sec, int today){
 	for(int i = 0; i < size; i++){
-		if(hour == alarm_clock[i].hours && minute == alarm_clock[i].minutes && alarm_clock[i].status && alarm_clock[i].days[today] && sec == 0){
-			beep();
-			
+		if(hour == alarm_clock[i].hours && minute == alarm_clock[i].minutes && alarm_clock[i].status && sec == 0){
+			testUser(&alarm_clock[i]);
 		}
 	}
 }
@@ -237,9 +236,8 @@ void* displayTimeThread(void*){
 	lcd.on();
 	lcd.clear();
 
-	testUser();
-
 	while(true) {
+		lcd_mutex.lock();
 		lcd.clear();
 		auto now = std::chrono::system_clock::now();
 		time_t t = chrono::system_clock::to_time_t(now);
@@ -259,6 +257,7 @@ void* displayTimeThread(void*){
 		lcd.print(buffer);
 		lcd.setCursor(0, 1);
 		lcd.print(buffer2);
+		lcd_mutex.unlock();
 		waitDelay(1, 0);
 	}
 }
@@ -267,13 +266,19 @@ static void playSentence() {
 
 }
 
-void testUser() {
+void testUser(Alarm_t *alarm) {
 	lcd_mutex.lock();
-	int difficulty = 1;
+	int difficulty = alarm->difficulty;
 	char question[512];
 	bool answered = false;
 	int questionType = 0;
 	bool pressedWrong = false;
+
+	for(int i = 0; i < 5; i++) {
+		AudioMixer_queueSound(&alarm_sound);
+		waitDelay(0,400000000);
+	}
+
 
 	//mutiple choice
 	if(questionType == 0) {
@@ -386,13 +391,14 @@ void testUser() {
 		lcd.setCursor(0, 1);
 		lcd.print("dwn: repeat ansr");
 
-		
 		while(!answered) {
 			char pressed = getPressed();
 			if(Joystick_checkUp()) {
 				AudioMixer_queueSound(&questionWave);
+				waitDelay(5, 0);
 			} else if(Joystick_checkDown()) {
 				AudioMixer_queueSound(&answerWave);
+				waitDelay(5, 0);
 			} else if(pressed != ' ') {
 				answered = true;
 				if(pressed != answerChar) {
@@ -401,6 +407,8 @@ void testUser() {
 					lcd.print("WRONG!");
 					waitDelay(0, 900000000);
 				}
+			} else if(AudioMixer_isQueueEmpty()) {
+				AudioMixer_queueSound(&alarm_sound);
 			}
 			waitDelay(0, 400000000);
 		}
@@ -504,6 +512,6 @@ void testUser() {
 	lcd.noCursor();
 	lcd_mutex.unlock();
 	if(pressedWrong) {
-		testUser();
+		testUser(alarm);
 	}
 }
