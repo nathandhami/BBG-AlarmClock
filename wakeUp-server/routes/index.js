@@ -1,5 +1,6 @@
 var express = require('express');
 var xssFilters = require('xss-filters');
+var moment = require('moment-timezone');
 var Alarm = require('../models/Alarm');
 var router = express.Router();
 var isInitialised = false;
@@ -61,9 +62,8 @@ router.route('/alarm/set')
 
     // TODO: date time zone needs to be set!
     if (!isDaySet) {
-      var now = new Date();
-      var index = now.getDay();
-      days[index] = 'on';
+      var todayId = moment().tz("America/Los_Angeles").day();
+      days[todayId] = 'on';
     }
 
     var diff_level = xssFilters.inHTMLData(req.body.level);
