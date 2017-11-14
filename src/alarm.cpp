@@ -106,7 +106,8 @@ void Alarm_endProgram(){
 //check if the alarm has to rang or not
 void checkAlarm(int hour, int minute, int sec, int today){
 	for(int i = 0; i < size; i++){
-		if(hour == alarm_clock[i].hours && minute == alarm_clock[i].minutes && alarm_clock[i].status && sec == 0){
+		if(hour == alarm_clock[i].hours && minute == alarm_clock[i].minutes && 
+			alarm_clock[i].status && alarm_clock[i].days[today] && sec == 0){
 			testUser(&alarm_clock[i]);
 		}
 	}
