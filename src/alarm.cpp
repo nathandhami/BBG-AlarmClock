@@ -56,8 +56,6 @@ static mutex lcd_mutex;
 static void* displayTimeThread(void*);
 static void* alarmThread(void*);
 static void testUser(Alarm_t *alarm);
-static void beep();
-static _Bool stopAlarm();
 static void speechInit(const char* problem, wavedata_t* file);
 
 void waitDelay(long sec, long nanoSec){
@@ -111,24 +109,6 @@ void checkAlarm(int hour, int minute, int sec, int today){
 			testUser(&alarm_clock[i]);
 		}
 	}
-}
-
-void beep(){
-	_Bool alarmBeeping = false;
-
-	while(!alarmBeeping){
-		AudioMixer_queueSound(&alarm_sound);
-		if(stopAlarm()){
-			alarmBeeping = true;
-		}
-		waitDelay(0,700000000);
-	}
-}
-
-
-//stopping alarm by pressing up on the joystick (temporary)
-_Bool stopAlarm(){
-	return Joystick_checkUp();
 }
 
 // Text to speech function
@@ -284,17 +264,12 @@ void* displayTimeThread(void*){
 	}
 }
 
-
-static void playSentence() {
-
-}
-
 void testUser(Alarm_t *alarm) {
 	lcd_mutex.lock();
 	int difficulty = alarm->difficulty;
 	char question[512];
 	bool answered = false;
-	int questionType = 0;
+	int questionType = rand() % 2;
 	bool pressedWrong = false;
 
 	for(int i = 0; i < 5; i++) {
@@ -525,6 +500,10 @@ void testUser(Alarm_t *alarm) {
 						lcd.blink();
 					}
 				}
+			}
+
+			if(AudioMixer_isQueueEmpty()) {
+				AudioMixer_queueSound(&alarm_sound);
 			}
 
 			waitDelay(0, 400000000);
