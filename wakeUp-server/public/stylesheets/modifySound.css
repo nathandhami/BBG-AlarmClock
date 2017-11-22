@@ -13,7 +13,8 @@
     border-color: gray;
 }
 
-.upload-button:hover {
-	background: transparent;
-	border-color: #3ba024;
+.upload-button:hover, .upload-button:focus, .upload-button:active {
+	background: transparent !important;
+	border-color: #3ba024 !important;
+	outline: none !important;
 }

@@ -28,7 +28,7 @@ block content
 		form(ref="uploadForm", id="uploadForm", action="/alarmSound/set", method="post", encType="multipart/form-data")
 			.form-group.upload-div
 				input.form-control.file-button(type='file', name='alarm_sound', accept='audio/*', required)
-				input.btn.btn-primary.time-button.upload-button.hvr-push(type='submit', value='Upload')
+				input.btn.btn-primary.upload-button.hvr-push(type='submit', value='Upload')
 	.alarm-div.col-xs-10
 		- for (let i = 0; i < alarms.length; i++) {
 			+alarm-item(alarms[i].time, alarms[i].level, alarms[i].identification, alarms[i].statusOn, alarms[i])

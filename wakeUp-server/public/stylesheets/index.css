@@ -6,13 +6,13 @@ html, body{
 }
 
 .clock-div {
-    height: 60%;
+    height: 55%;
     width: 100%;
 }
 
 .clock-wrapper{
     position: absolute;
-    top: 30%;
+    top: 25%;
     right: 0;
     bottom: 70%;
     left: 0;
@@ -175,6 +175,7 @@ html, body{
     right: 0;
     left: 0;
     margin: auto;
+    margin-top: 1em;
 }
 
 .hide-close-button {
