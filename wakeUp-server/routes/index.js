@@ -53,6 +53,8 @@ router.route('/alarm/set')
     days.push(xssFilters.inHTMLData(req.body.friday));
     days.push(xssFilters.inHTMLData(req.body.saturday));
 
+    var questionType = xssFilters.inHTMLData(req.body.questionType);
+
     for (let i = 0; i < days.length; i++) {
       if (days[i] == 'on') {
         isDaySet = true;

@@ -79,7 +79,14 @@ $(document).ready( function() {
             status: $(this).prop('checked'),
         }
     });
-});
+  });
+
+  $(".question-type-dropdown li a").click( function(e) {
+    var selected = $(this).text();
+
+    $("#questionBtn").val(selected);
+    $("#questionBtn").text(selected);
+  });
 
 });
 

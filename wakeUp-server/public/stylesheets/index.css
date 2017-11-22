@@ -370,7 +370,8 @@ input:checked + .slider:before {
 }
 
 .difficulty-level {
-    margin-top: 10px;
+    margin-top: 35px;
+    float: right;
 }
 
 .difficulty-level label {
