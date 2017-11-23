@@ -47,6 +47,7 @@ $(OBJDIR)/%.o: $(SRC_DIR)/%.c
 nodeserver:
 		mkdir -p $(PUBDIR)/$(NODEDIR)-copy
 		cp -R $(NODEDIR)/* $(PUBDIR)/$(NODEDIR)-copy
+		chmod a+rw $(PUBDIR)/$(NODEDIR)-copy/public/ 
 
 wave:
 	mkdir -p $(OUTDIR)/wave-files/
