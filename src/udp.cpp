@@ -124,9 +124,8 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 		data = extractPacketData(udpCommand);
 		vector<Alarm_t> alarmClocks = parseAlarmData(data);
 
-		//INITIALISE alarm array (change array to vector) in alarm.c to above vector object
-		for(int i = 0; i < alarmClocks.size(); i++){
-			Alarm_addAlarm(alarmClocks[i].hours, alarmClocks[i].minutes, 					alarmClocks[i].id, alarmClocks[i].difficulty, 					alarmClocks[i].status, alarmClocks[i].days);
+		for(unsigned int i = 0; i < alarmClocks.size(); i++){
+			Alarm_addAlarm(alarmClocks[i]);
 		}
 	} 
 	else if (isUdpThisCommand(udpCommand, COMMAND_CREATE_ALARM)) {
@@ -134,7 +133,7 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 		struct Alarm_t alarm = parseAlarmData(data)[0];
 
 		//CREATE new alarm in alarm.c from above new alarm
-		Alarm_addAlarm(alarm.hours, alarm.minutes, alarm.id, alarm.difficulty, 					alarm.status, alarm.days);
+		Alarm_addAlarm(alarm);
 	}
 	else if (isUdpThisCommand(udpCommand, COMMAND_EDIT_ALARM)) {
 		data = extractPacketData(udpCommand);
@@ -142,7 +141,7 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 
 		//EDIT alarm in alarm.c from above object
 		//use ID field in alarm[i] to edit which one
-		Alarm_editAlarm(alarm.hours, alarm.minutes, alarm.id, alarm.difficulty, 				alarm.status, alarm.days);
+		Alarm_editAlarm(alarm);
 	} 
 	else if (isUdpThisCommand(udpCommand, COMMAND_DELETE_ALARM)) {
 		data = extractPacketData(udpCommand);
@@ -156,7 +155,6 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 	}
 	else if (isUdpThisCommand(udpCommand, COMMAND_CHANGE_SOUND)) {
 		data = extractPacketData(udpCommand);
-		int id;
 		if (data != NULL) {
 			//Change sound used for alarm
 			Alarm_changeSound(data);
@@ -208,8 +206,9 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 		char* timeString = splitString(alarmSplitted[0], delimiter)[1];
 		char* statusString = splitString(alarmSplitted[1], delimiter)[1];
 		char* levelString = splitString(alarmSplitted[2], delimiter)[1];
-		char* daysString = splitString(alarmSplitted[3], delimiter)[1];
-		char* idString = splitString(alarmSplitted[4], delimiter)[1];
+		char* questionString = splitString(alarmSplitted[3], delimiter)[1];
+		char* daysString = splitString(alarmSplitted[4], delimiter)[1];
+		char* idString = splitString(alarmSplitted[5], delimiter)[1];
 
 		_Bool isTimePM;
 		if (((string)timeString).find("PM") != string::npos) {
@@ -239,6 +238,13 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 			difficulty = 2;
 		}
 
+		int question = 0;
+		if (strcmp(questionString, "Arithmetic") == 0) {
+			question = 1;
+		} else if (strcmp(levelString, "MCQs") == 0) {
+			question = 2;
+		}
+
 		delimiter = (char *)",";
 		vector<char*> isDaysOn = splitString(daysString, delimiter);
 		_Bool days[] = {false, false, false, false, false, false, false};
@@ -255,6 +261,7 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 		a.minutes = mins;
 		a.status = status;
 		a.difficulty = difficulty;
+		a.questionType = question;
 		a.id = id;
 		for (int j = 0; j < DAYS_IN_WEEK; j++) {
 			a.days[j] = days[j];

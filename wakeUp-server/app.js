@@ -8,7 +8,7 @@ var nconf = require('./src/nconf/nConfig');
 var mongoose = require('mongoose');
 var expressSession = require('express-session');
 var MongoStore = require('connect-mongo')(expressSession);
-const fileUpload = require('express-fileupload');
+var multer = require('multer');
 
 var index = require('./routes/index');
 var modifySound = require('./routes/modifySound');
@@ -41,10 +41,13 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(fileUpload());
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
+
+app.use(multer({
+  dest: './public/uploads/',
+}).single("alarm_sound"));
 
 var socketClient = require('socket.io-client')(nconf.get('http:url'));
 socketClient.on('connect', function(data) {

@@ -17,7 +17,7 @@
               input.timepicker1.form-control.input-small(type="text", name="time")
               span.input-group-addon
                 i.glyphicon.glyphicon-time
-          .form-group.btn-group.col-sm-7.weekdays(data-toggle="buttons")
+          .form-group.btn-group.weekdays(data-toggle="buttons")
             label.btn.btn-default.btn-circle
               input#day1(type="checkbox", name="sunday", autocomplete="off")
               |  S
@@ -39,16 +39,28 @@
             label.btn.btn-default.btn-circle
               input#day7(type="checkbox", name="saturday", autocomplete="off")
               |  S
-          .form-group.btn-group.col-sm-12.difficulty-level(data-toggle="buttons")
-            label.btn.btn-default.active
-              input#radio1(type="radio", name="level", autocomplete="off", checked, value="easy")
-              |  Easy
-            label.btn.btn-default
-              input#radio2(type="radio", name="level", autocomplete="off", value="medium")
-              |  Medium
-            label.btn.btn-default
-              input#radio3(type="radio", name="level", autocomplete="off", value="hard")
-              |  Hard
+          .form-group.col-sm-12(style="margin-bottom: 3em;")
+            .form-group.col-sm-5
+              .dropdown
+                h5(style="display: block") Type of Questions:
+                input#questionBtn.btn.btn-default.dropdown-toggle(type='text', name="questionType", data-toggle='dropdown', style="margin-left: 1em", value="Random", readonly)
+                ul.dropdown-menu.question-type-dropdown
+                  li
+                    a(href="#") Random
+                  li
+                    a(href="#") Arithmetic
+                  li
+                    a(href="#") MCQs
+            .form-group.btn-group.difficulty-level(data-toggle="buttons")
+              label.btn.btn-default.active
+                input#radio1(type="radio", name="level", autocomplete="off", checked, value="easy")
+                |  Easy
+              label.btn.btn-default
+                input#radio2(type="radio", name="level", autocomplete="off", value="medium")
+                |  Medium
+              label.btn.btn-default
+                input#radio3(type="radio", name="level", autocomplete="off", value="hard")
+                |  Hard
           .form-group
             button#saveBtn.btn.btn-success.pull-right(type='submit', style='margin-left: 1em;') Set Alarm
             button.btn.pull-right(data-dismiss='modal', aria-hidden='true') Cancel     

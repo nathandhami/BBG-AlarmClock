@@ -21,6 +21,7 @@ router.get('/', function(req, res, next) {
             alarmString += "Time=" + alarms[i].time + "-";
             alarmString += "StatusOn=" + alarms[i].statusOn + "-";
             alarmString += "Difficulty=" + alarms[i].level + "-";
+            alarmString += "Question=" + alarms[i].question + "-";
             alarmString += "Days=" + alarms[i].days + "-";
             alarmString += "ID=" + alarms[i].identification;
             alarmString += "\n";
@@ -53,6 +54,8 @@ router.route('/alarm/set')
     days.push(xssFilters.inHTMLData(req.body.friday));
     days.push(xssFilters.inHTMLData(req.body.saturday));
 
+    var questionType = xssFilters.inHTMLData(req.body.questionType);
+
     for (let i = 0; i < days.length; i++) {
       if (days[i] == 'on') {
         isDaySet = true;
@@ -78,6 +81,7 @@ router.route('/alarm/set')
           time: alarmTime,
           days: days,
           level: diff_level,
+          question: questionType,
           statusOn: true,
         });
 
@@ -87,6 +91,7 @@ router.route('/alarm/set')
           alarmString += "Time=" + newAlarm.time + "-";
           alarmString += "StatusOn=" + newAlarm.statusOn + "-";
           alarmString += "Difficulty=" + newAlarm.level + "-";
+          alarmString += "Question=" + newAlarm.question + "-";
           alarmString += "Days=" + newAlarm.days + "-";
           alarmString += "ID=" + newAlarm.identification;
           alarmString += "\n";
@@ -97,6 +102,7 @@ router.route('/alarm/set')
           alarm.time = alarmTime;
           alarm.days = days;
           alarm.level = diff_level;
+          alarm.question = questionType;
           alarm.status = true;
 
           alarm.save((err, object) => {
@@ -105,6 +111,7 @@ router.route('/alarm/set')
             alarmString += "Time=" + alarm.time + "-";
             alarmString += "StatusOn=" + alarm.statusOn + "-";
             alarmString += "Difficulty=" + alarm.level + "-";
+            alarmString += "Question=" + alarm.question + "-";
             alarmString += "Days=" + alarm.days + "-";
             alarmString += "ID=" + alarm.identification;
             alarmString += "\n";
@@ -160,6 +167,7 @@ router.route('/alarm/status')
             alarmString += "Time=" + alarm.time + "-";
             alarmString += "StatusOn=" + alarm.statusOn + "-";
             alarmString += "Difficulty=" + alarm.level + "-";
+            alarmString += "Question=" + alarm.question + "-";
             alarmString += "Days=" + alarm.days + "-";
             alarmString += "ID=" + alarm.identification;
             alarmString += "\n";

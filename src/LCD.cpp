@@ -337,7 +337,7 @@ size_t LCD::write(uint8_t value)
 
 void LCD::print(const char *string)
 {
-for (int i=0;i<strlen(string);i++)
+for (unsigned int i=0;i<strlen(string);i++)
  write(string[i]);
 }
 

@@ -123,37 +123,39 @@ void speechInit(const char* sentence, wavedata_t* file){
 }
 
 //function to add alarm
-void Alarm_addAlarm(int hour, int minute, int ids, int diff, _Bool stats, _Bool day[7]){
-	if((hour>=0 && hour<=24) && (minute>=0 && minute<=59)){
-		alarm_clock[size].hours = hour;
-		alarm_clock[size].minutes = minute;
-		alarm_clock[size].id = ids;
-		alarm_clock[size].difficulty = diff;
-		alarm_clock[size].status = stats;
+void Alarm_addAlarm(Alarm_t alarm){
+	if((alarm.hours>=0 && alarm.hours<=24) && (alarm.minutes>=0 && alarm.minutes<=59)){
+		alarm_clock[size].hours = alarm.hours;
+		alarm_clock[size].minutes = alarm.minutes;
+		alarm_clock[size].id = alarm.id;
+		alarm_clock[size].difficulty = alarm.difficulty;
+		alarm_clock[size].questionType = alarm.questionType;
+		alarm_clock[size].status = alarm.status;
 		for(int i = 0; i < 7; i++){
-			alarm_clock[size].days[i] = day[i];
+			alarm_clock[size].days[i] = alarm.days[i];
 		}
 		size++;
 	}
 }
 
 //function to edit alarm (not yet used)
-void Alarm_editAlarm(int hour, int minute, int ids, int diff, _Bool stats, _Bool day[7]){
+void Alarm_editAlarm(Alarm_t alarm){
 	_Bool found = false;
 	int i = -1;
 	while(i < size-1 && !found){
 		i++;
-		if(alarm_clock[i].id == ids){
+		if(alarm_clock[i].id == alarm.id){
 			found = true;
 		}
 	}
 	if(found){
-		alarm_clock[i].hours = hour;
-		alarm_clock[i].minutes = minute;
-		alarm_clock[i].status = stats;
-		alarm_clock[i].difficulty = diff;
+		alarm_clock[i].hours = alarm.hours;
+		alarm_clock[i].minutes = alarm.minutes;
+		alarm_clock[i].difficulty = alarm.difficulty;
+		alarm_clock[i].questionType = alarm.questionType;
+		alarm_clock[i].status = alarm.status;
 		for(int j = 0; j < 7; j++){
-			alarm_clock[i].days[j] = day[j];
+			alarm_clock[i].days[j] = alarm.days[j];
 		}
 	}
 	else{
@@ -176,6 +178,7 @@ void Alarm_deleteAlarm(int ids){
 		alarm_clock[i].minutes = alarm_clock[size-1].minutes;
 		alarm_clock[i].id = alarm_clock[size-1].id;
 		alarm_clock[i].difficulty = alarm_clock[size-1].difficulty;
+		alarm_clock[i].questionType = alarm_clock[size-1].questionType;
 		alarm_clock[i].status = alarm_clock[size-1].status;
 		for(int j = 0; j < 7; j++){
 			alarm_clock[i].days[j] = alarm_clock[size-1].days[j];

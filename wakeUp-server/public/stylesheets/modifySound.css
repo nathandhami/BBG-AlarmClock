@@ -1,10 +1,20 @@
-html, body{
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background-image:linear-gradient(#bc6969,#274e75);
+.upload-div {
+	text-align: center;
 }
 
-.offset-brah {
-    margin-top: 100px;
+.file-button {
+	width: 20%;
+	display: inline-block !important;
+}
+
+.upload-button {
+	margin-left: 1em;
+	display: inline-block;
+    border-color: gray;
+}
+
+.upload-button:hover, .upload-button:focus, .upload-button:active {
+	background: transparent !important;
+	border-color: #3ba024 !important;
+	outline: none !important;
 }
