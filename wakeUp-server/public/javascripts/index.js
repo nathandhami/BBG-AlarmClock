@@ -35,6 +35,9 @@ $(document).ready( function() {
         $('#radio3').click();
     }
 
+    $("#questionBtn").val(aInfo.question);
+    $("#questionBtn").text(aInfo.question);
+
     for (var i = 0; i < aInfo.days.length; i++) {
       var id = i + 1;
       if (aInfo.days[i] == "on") {
@@ -58,6 +61,9 @@ $(document).ready( function() {
         }
         $('#radio1').click();
       }
+
+      $("#questionBtn").val("Random");
+      $("#questionBtn").text("Random");
 
       $('#saveBtn').text('Set Alarm');
   });

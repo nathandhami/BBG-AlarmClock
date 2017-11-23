@@ -144,7 +144,7 @@ void Alarm_editAlarm(Alarm_t alarm){
 	int i = -1;
 	while(i < size-1 && !found){
 		i++;
-		if(alarm_clock[i].id == ids){
+		if(alarm_clock[i].id == alarm.id){
 			found = true;
 		}
 	}
@@ -178,6 +178,7 @@ void Alarm_deleteAlarm(int ids){
 		alarm_clock[i].minutes = alarm_clock[size-1].minutes;
 		alarm_clock[i].id = alarm_clock[size-1].id;
 		alarm_clock[i].difficulty = alarm_clock[size-1].difficulty;
+		alarm_clock[i].questionType = alarm_clock[size-1].questionType;
 		alarm_clock[i].status = alarm_clock[size-1].status;
 		for(int j = 0; j < 7; j++){
 			alarm_clock[i].days[j] = alarm_clock[size-1].days[j];

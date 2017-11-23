@@ -124,8 +124,7 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 		data = extractPacketData(udpCommand);
 		vector<Alarm_t> alarmClocks = parseAlarmData(data);
 
-		//INITIALISE alarm array (change array to vector) in alarm.c to above vector object
-		for(int i = 0; i < alarmClocks.size(); i++){
+		for(unsigned int i = 0; i < alarmClocks.size(); i++){
 			Alarm_addAlarm(alarmClocks[i]);
 		}
 	} 
@@ -156,7 +155,6 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor, struct soc
 	}
 	else if (isUdpThisCommand(udpCommand, COMMAND_CHANGE_SOUND)) {
 		data = extractPacketData(udpCommand);
-		int id;
 		if (data != NULL) {
 			//Change sound used for alarm
 			Alarm_changeSound(data);
