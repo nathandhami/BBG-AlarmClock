@@ -31,6 +31,7 @@ static wavedata_t alarm_sound;
 static wavedata_t questionAndAnswerWave;
 static wavedata_t questionWave;
 static wavedata_t answerWave;
+static int hourToggle = 1;
 
 static const char * months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 static const char * days[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -57,6 +58,7 @@ static void* displayTimeThread(void*);
 static void* alarmThread(void*);
 static void testUser(Alarm_t *alarm);
 static void speechInit(const char* problem, wavedata_t* file);
+void toggleHours();
 
 void waitDelay(long sec, long nanoSec){
 	long seconds = sec;
@@ -248,6 +250,12 @@ void* displayTimeThread(void*){
 		time_t t = chrono::system_clock::to_time_t(now);
 		tm local_tm = *localtime(&t);
 		int hour = local_tm.tm_hour; 
+		if(hourToggle) {
+			hour = (hour%12);
+			if(hour == 0) {
+				hour = 12;
+			}
+		}
 		int minute = local_tm.tm_min;
 		int second = local_tm.tm_sec;
 		int weekDay = local_tm.tm_wday;
@@ -263,6 +271,9 @@ void* displayTimeThread(void*){
 		lcd.setCursor(0, 1);
 		lcd.print(buffer2);
 		lcd_mutex.unlock();
+		if(Joystick_checkDown()) {
+				toggleHours();
+		}
 		waitDelay(1, 0);
 	}
 }
@@ -272,7 +283,10 @@ void testUser(Alarm_t *alarm) {
 	int difficulty = alarm->difficulty;
 	char question[512];
 	bool answered = false;
-	int questionType = rand() % 2;
+	int questionType = alarm->questionType;
+	if(questionType == 2) {
+		questionType = rand() % 2;	
+	} 
 	bool pressedWrong = false;
 
 	for(int i = 0; i < 5; i++) {
@@ -518,5 +532,13 @@ void testUser(Alarm_t *alarm) {
 	lcd_mutex.unlock();
 	if(pressedWrong) {
 		testUser(alarm);
+	}
+}
+
+void toggleHours() {
+	if(hourToggle) {
+		hourToggle = 0;
+	} else {
+		hourToggle = 1;
 	}
 }
