@@ -287,7 +287,8 @@ void* playbackThread(void* arg)
 	return NULL;
 }
 
-bool AudioMixer_isQueueEmpty() {
+bool AudioMixer_isQueueEmpty()
+{
 	// Insert the sound by searching for an empty sound bite spot
 	int i = 0;
 	while(i < MAX_SOUND_BITES){

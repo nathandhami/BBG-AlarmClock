@@ -1,7 +1,8 @@
 #include "udp.h"
 #include "alarm.h"
 
-int main (int argc, char *argv []) {
+int main (int argc, char *argv [])
+{
 	Alarm_startProgram();
 	UDP_startServer();
 
