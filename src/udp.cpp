@@ -177,8 +177,7 @@ static char *extractPacketData(char *buffer)
 	return extractData;
 }
 
-static vector<char*> splitString(char* str, char* delimiter)
-{
+static vector<char*> splitString(char* str, char* delimiter) {
 	vector<char*> packetElements;
 	char* element;
 
@@ -192,8 +191,8 @@ static vector<char*> splitString(char* str, char* delimiter)
 	return packetElements;
 }
 
-static vector<Alarm_t> parseAlarmData(char* alarmData)
-{
+static vector<Alarm_t> parseAlarmData(char* alarmData) {
+
 	vector<Alarm_t> totalAlarms;
 
 	char* delimiter = (char *)"\n";
