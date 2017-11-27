@@ -243,11 +243,11 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 			difficulty = 2;
 		}
 
-		int question = 0;	// Random
+		int question = 2;	// Random
 		if (strcmp(questionString, "Arithmetic") == 0) {
 			question = 1;
 		} else if (strcmp(levelString, "MCQs") == 0) {
-			question = 2;
+			question = 0;
 		}
 
 		delimiter = (char *)",";
