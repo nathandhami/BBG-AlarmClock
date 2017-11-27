@@ -210,7 +210,7 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 		char* daysString = splitString(alarmSplitted[4], delimiter)[1];
 		char* idString = splitString(alarmSplitted[5], delimiter)[1];
 
-		_Bool isTimePM;
+		_Bool isTimePM = false;
 		if (((string)timeString).find("PM") != string::npos) {
 		    isTimePM = true;
 		}
@@ -223,6 +223,11 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 		if (isTimePM) {
 			if (hour < 12) {
 				hour += 12;
+			}
+		}
+		else {
+			if (hour == 12){
+				hour -= 12;
 			}
 		}
 
@@ -238,7 +243,7 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 			difficulty = 2;
 		}
 
-		int question = 0;
+		int question = 0;	// Random
 		if (strcmp(questionString, "Arithmetic") == 0) {
 			question = 1;
 		} else if (strcmp(levelString, "MCQs") == 0) {
