@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include "json.hpp"
+#include "defs.h"
 extern "C" {
 	#include "deviceread.h"
 	#include "utils.h"
@@ -284,7 +285,7 @@ void testUser(Alarm_t *alarm) {
 	char question[512];
 	bool answered = false;
 	int questionType = alarm->questionType;
-	if(questionType == 2) {
+	if(questionType == QUESTION_TYPE_RANDOM) {
 		questionType = rand() % 2;	
 	} 
 	bool pressedWrong = false;
@@ -296,17 +297,17 @@ void testUser(Alarm_t *alarm) {
 
 
 	//mutiple choice
-	if(questionType == 0) {
+	if(questionType == QUESTION_TYPE_MC) {
 		//read questions from json
 		json questions;
 
-		if(difficulty == 0) {
+		if(difficulty == DIFFICULTY_EASY) {
 			std::ifstream stream("questions/easy.json");
 			stream >> questions;
-		} else if(difficulty == 1) {
+		} else if(difficulty == DIFFICULTY_MEDIUM) {
 			std::ifstream stream("questions/medium.json");
 			stream >> questions;
-		} else if(difficulty == 2) {
+		} else if(difficulty == DIFFICULTY_HARD) {
 			std::ifstream stream("questions/hard.json");
 			stream >> questions;
 		}
@@ -436,7 +437,7 @@ void testUser(Alarm_t *alarm) {
 	//Arithmatic
 	} else {
 		int answer = 0;
-		if(difficulty == 0) {
+		if(difficulty == DIFFICULTY_EASY) {
 			int questionSubType = rand() % 2;
 			int arg1, arg2;
 			if(questionSubType == 0) {
@@ -452,7 +453,7 @@ void testUser(Alarm_t *alarm) {
 				sprintf (question, "%d x %d =", arg1, arg2);
 			}
 
-		} else if(difficulty == 1) {
+		} else if(difficulty == DIFFICULTY_MEDIUM) {
 			int questionSubType = rand() % 2;
 			int arg1, arg2;
 			if(questionSubType == 0) {
@@ -468,7 +469,7 @@ void testUser(Alarm_t *alarm) {
 				sprintf (question, "%d x %d =", arg1, arg2);
 			}
 
-		} else if(difficulty == 2) {
+		} else if(difficulty == DIFFICULTY_HARD) {
 			int questionSubType = rand() % 2;
 			int arg1, arg2;
 			if(questionSubType == 0) {

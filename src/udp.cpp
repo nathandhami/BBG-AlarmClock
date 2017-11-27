@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <string.h>
+#include "defs.h"
 
 #define UDP_PORT 12345
 #define MAX_RECEIVE_MESSAGE_LENGTH 8000
@@ -236,18 +237,18 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 			status = false;
 		}
 
-		int difficulty = 0;
+		int difficulty = DIFFICULTY_EASY;
 		if (strcmp(levelString, "medium") == 0) {
-			difficulty = 1;
+			difficulty = DIFFICULTY_MEDIUM;
 		} else if (strcmp(levelString, "hard") == 0) {
-			difficulty = 2;
+			difficulty = DIFFICULTY_HARD;
 		}
 
-		int question = 2;	// Random
+		int question = QUESTION_TYPE_RANDOM;
 		if (strcmp(questionString, "Arithmetic") == 0) {
-			question = 1;
+			question = QUESTION_TYPE_ARITHMETIC;
 		} else if (strcmp(levelString, "MCQs") == 0) {
-			question = 0;
+			question = QUESTION_TYPE_MC;
 		}
 
 		delimiter = (char *)",";
