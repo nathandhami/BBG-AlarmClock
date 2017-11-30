@@ -1,10 +1,3 @@
-/*
- * joystick.c
- *
- *  Created on: Nov 11, 2017
- *      Author: ndhami
- */
-
 #include "joystick.h"
 #include "utils.h"
 

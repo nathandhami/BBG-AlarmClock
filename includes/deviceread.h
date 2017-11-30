@@ -1,8 +1,6 @@
 /*
  * deviceread.h
- *
- *  Created on: Oct 27, 2017
- *      Author: ndhami
+ * Reads external devices connected to beaglebone in a separate thread
  */
 
 #ifndef DEVICEREAD_H_

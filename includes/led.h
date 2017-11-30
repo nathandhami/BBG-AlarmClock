@@ -1,9 +1,6 @@
 /*
  * led.h
- *
- *  Created on: Nov 5, 2017
- *      Author: ndhami
- *      Purpose: Used for blinking led during alarm
+ * Used for blinking led during alarm
  */
 
 #ifndef _LED_H_

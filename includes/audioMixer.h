@@ -1,3 +1,5 @@
+// audioMixer.h
+// Plays audio in wav format on the beagle bone
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

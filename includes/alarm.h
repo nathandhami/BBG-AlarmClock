@@ -1,3 +1,5 @@
+// alarm.h
+// Main interface for managing alarms and starts up the skill-testing alarm clock thread
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

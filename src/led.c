@@ -1,10 +1,3 @@
-/*
- * led.c
- *
- *  Created on: Nov 6, 2017
- *      Author: ndhami
- */
-
 #include "utils.h"
 #include "led.h"
 

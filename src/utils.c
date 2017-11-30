@@ -1,10 +1,3 @@
-/*
- * utils.c
- *
- *  Created on: Oct 27, 2017
- *      Author: ndhami
- */
-
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>

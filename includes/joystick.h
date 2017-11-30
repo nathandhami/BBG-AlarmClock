@@ -1,8 +1,6 @@
 /*
  * joystick.h
- *
- *  Created on: Nov 11, 2017
- *      Author: ndhami
+ * Joystick interface code
  */
 
 #ifndef INCLUDES_JOYSTICK_H_

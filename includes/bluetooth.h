@@ -1,6 +1,6 @@
 /*
  * bluetooth.h
- * Purpose: Bluetooth Server Thread Module
+ * Bluetooth Server Thread Module used to interact with Android device
  */
 
 #ifndef INCLUDES_BLUETOOTH_H_

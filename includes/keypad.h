@@ -1,8 +1,6 @@
 /*
  * keypad.h
- *
- *  Created on: Oct 27, 2017
- *      Author: ndhami
+ * Interface code with keypad hardware
  */
 
 #ifndef KEYPAD_H_
