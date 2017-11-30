@@ -5,7 +5,7 @@ SRC_DIR= src
 
 CPP_SOURCES= main.cpp I2CIO.cpp LCD.cpp LiquidCrystal_I2C.cpp alarm.cpp udp.cpp
 	   	     
-C_SOURCES = utils.c deviceread.c keypad.c audioMixer.c joystick.c
+C_SOURCES = utils.c deviceread.c keypad.c audioMixer.c joystick.c bluetooth.c
 
 OBJDIR = build
 
@@ -16,7 +16,7 @@ CPP_OBJ_LIST = $(addsuffix .o, $(basename $(CPP_SOURCES)))
 C_OBJ = $(addprefix $(OBJDIR)/, $(C_OBJ_LIST))
 CPP_OBJ = $(addprefix $(OBJDIR)/, $(CPP_OBJ_LIST))
 
-LFLAGS = -Llib -lpthread -lasound -static-libstdc++
+LFLAGS = -Llib -lpthread -lasound -static-libstdc++ -lbluetooth
 IFLAGS = -Iincludes
 
 PUBDIR = $(HOME)/cmpt433/public/myApps

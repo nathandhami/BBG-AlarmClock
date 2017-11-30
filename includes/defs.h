@@ -1,9 +1,6 @@
 /*
  * defs.h
- *
- *  Created on: Nov 27, 2017
- *      Author: ndhami
- *      Purpose: Shareable defined values used in multiple files
+ * Shareable defined values used in multiple files
  */
 
 #ifndef INCLUDES_DEFS_H_
