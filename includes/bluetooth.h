@@ -1,9 +1,6 @@
 /*
  * bluetooth.h
- *
- *  Created on: Nov 13, 2017
- *      Author: ndhami
- *      Source: http://www.cs.sfu.ca/CourseCentral/433/bfraser/other/2015-student-howtos/BBBluetoothGuide.pdf
+ * Purpose: Bluetooth Server Thread Module
  */
 
 #ifndef INCLUDES_BLUETOOTH_H_

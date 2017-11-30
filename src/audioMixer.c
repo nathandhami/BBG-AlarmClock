@@ -13,7 +13,7 @@ static snd_pcm_t *handle;
 
 #define BUFFLEN 1024
 
-#define DEFAULT_VOLUME 80
+#define DEFAULT_VOLUME 100
 
 #define SAMPLE_RATE 16000
 #define NUM_CHANNELS 1

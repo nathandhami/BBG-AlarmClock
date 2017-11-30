@@ -13,6 +13,7 @@ typedef struct Alarm_t{
 	int minutes;
 	int id;
 	int difficulty;
+	int questionType;
 	_Bool status;
 	_Bool days[7];
 }Alarm_t;
@@ -22,8 +23,8 @@ void waitDelay(long sec, long nanoSec);
 void Alarm_startProgram();
 void Alarm_endProgram();
 
-void Alarm_addAlarm(int hour, int minute, int ids, int diff, _Bool stats, _Bool day[7]);
-void Alarm_editAlarm(int hour, int minute, int ids, int diff, _Bool stats, _Bool day[7]);
+void Alarm_addAlarm(Alarm_t alarm);
+void Alarm_editAlarm(Alarm_t alarm);
 void Alarm_deleteAlarm(int index);
 void Alarm_getAlarm();
 

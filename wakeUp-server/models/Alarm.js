@@ -8,6 +8,7 @@ const AlarmSchema = new mongoose.Schema({
   time: String,
   days: [],
   level: String,
+  question: String,
   statusOn: Boolean,
   identification: Number,
 });

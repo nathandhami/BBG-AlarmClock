@@ -24,6 +24,7 @@ $(document).ready( function() {
     $('#timeModal').modal('show');
     var aInfo = JSON.parse($(a.target).children('input').val());
 
+    $('#saveBtn').text('Save Alarm');
     $('#existingID').val(aInfo.identification);
     $('.timepicker1').val(aInfo.time);
     if (aInfo.level == "easy") {
@@ -33,6 +34,9 @@ $(document).ready( function() {
     } else {
         $('#radio3').click();
     }
+
+    $("#questionBtn").val(aInfo.question);
+    $("#questionBtn").text(aInfo.question);
 
     for (var i = 0; i < aInfo.days.length; i++) {
       var id = i + 1;
@@ -49,14 +53,27 @@ $(document).ready( function() {
       $('#existingID').val(-1);
       $('.timepicker1').val(moment(date).format('h:mm A'));
 
+
       for (var i = 0; i < 7; i++) {
         var id = i + 1;
         if ($('#day' + id).is(':checked')) {
           $('#day' + id).click();
         }
         $('#radio1').click();
-    }
+      }
+
+      $("#questionBtn").val("Random");
+      $("#questionBtn").text("Random");
+
+      $('#saveBtn').text('Set Alarm');
   });
+
+  $('#createBtn').click( function(e) {
+    var now = new Date();
+    var todayID = now.getDay() + 1;
+    $('#day' + todayID).click();
+  })
+
 
   //change status
   $(".alarm-status").on('change', function(e) {
@@ -68,7 +85,14 @@ $(document).ready( function() {
             status: $(this).prop('checked'),
         }
     });
-});
+  });
+
+  $(".question-type-dropdown li a").click( function(e) {
+    var selected = $(this).text();
+
+    $("#questionBtn").val(selected);
+    $("#questionBtn").text(selected);
+  });
 
 });
 

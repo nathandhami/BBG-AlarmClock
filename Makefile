@@ -1,5 +1,5 @@
 # Edit this file to compile extra C files into their own programs.
-TARGET= lcd
+TARGET= alarmer
 
 SRC_DIR= src
 
@@ -30,9 +30,9 @@ CFLAGS = -Wall -g -c -std=c99 -D _POSIX_C_SOURCE=200809L -Werror -pthread
 CPPFLAGS = -Wall -g -D _POSIX_C_SOURCE=200809L -std=c++11
 
 
-all: init lcd nodeserver wave
+all: init alarmer nodeserver wave
 	
-lcd: $(CPP_OBJ) $(C_OBJ)
+alarmer: $(CPP_OBJ) $(C_OBJ)
 	$(CC_CPP) $(CPPFLAGS) $(IFLAGS) $(CPP_OBJ) $(C_OBJ) $(SRC_DIR)/i2c-dev.h -o $(OUTDIR)/$(TARGET) $(LFLAGS)
 	
 init:
@@ -47,6 +47,7 @@ $(OBJDIR)/%.o: $(SRC_DIR)/%.c
 nodeserver:
 		mkdir -p $(PUBDIR)/$(NODEDIR)-copy
 		cp -R $(NODEDIR)/* $(PUBDIR)/$(NODEDIR)-copy
+		chmod a+rw $(PUBDIR)/$(NODEDIR)-copy/public/ 
 
 wave:
 	mkdir -p $(OUTDIR)/wave-files/

@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include "json.hpp"
+#include "defs.h"
 extern "C" {
 	#include "deviceread.h"
 	#include "utils.h"
@@ -31,6 +32,7 @@ static wavedata_t alarm_sound;
 static wavedata_t questionAndAnswerWave;
 static wavedata_t questionWave;
 static wavedata_t answerWave;
+static int hourToggle = 1;
 
 static const char * months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 static const char * days[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -56,9 +58,8 @@ static mutex lcd_mutex;
 static void* displayTimeThread(void*);
 static void* alarmThread(void*);
 static void testUser(Alarm_t *alarm);
-static void beep();
-static _Bool stopAlarm();
 static void speechInit(const char* problem, wavedata_t* file);
+void toggleHours();
 
 void waitDelay(long sec, long nanoSec){
 	long seconds = sec;
@@ -106,28 +107,11 @@ void Alarm_endProgram(){
 //check if the alarm has to rang or not
 void checkAlarm(int hour, int minute, int sec, int today){
 	for(int i = 0; i < size; i++){
-		if(hour == alarm_clock[i].hours && minute == alarm_clock[i].minutes && alarm_clock[i].status && sec == 0){
+		if(hour == alarm_clock[i].hours && minute == alarm_clock[i].minutes && 
+			alarm_clock[i].status && alarm_clock[i].days[today] && sec == 0){
 			testUser(&alarm_clock[i]);
 		}
 	}
-}
-
-void beep(){
-	_Bool alarmBeeping = false;
-
-	while(!alarmBeeping){
-		AudioMixer_queueSound(&alarm_sound);
-		if(stopAlarm()){
-			alarmBeeping = true;
-		}
-		waitDelay(0,700000000);
-	}
-}
-
-
-//stopping alarm by pressing up on the joystick (temporary)
-_Bool stopAlarm(){
-	return Joystick_checkUp();
 }
 
 // Text to speech function
@@ -142,37 +126,39 @@ void speechInit(const char* sentence, wavedata_t* file){
 }
 
 //function to add alarm
-void Alarm_addAlarm(int hour, int minute, int ids, int diff, _Bool stats, _Bool day[7]){
-	if((hour>=0 && hour<=24) && (minute>=0 && minute<=59)){
-		alarm_clock[size].hours = hour;
-		alarm_clock[size].minutes = minute;
-		alarm_clock[size].id = ids;
-		alarm_clock[size].difficulty = diff;
-		alarm_clock[size].status = stats;
+void Alarm_addAlarm(Alarm_t alarm){
+	if((alarm.hours>=0 && alarm.hours<=24) && (alarm.minutes>=0 && alarm.minutes<=59)){
+		alarm_clock[size].hours = alarm.hours;
+		alarm_clock[size].minutes = alarm.minutes;
+		alarm_clock[size].id = alarm.id;
+		alarm_clock[size].difficulty = alarm.difficulty;
+		alarm_clock[size].questionType = alarm.questionType;
+		alarm_clock[size].status = alarm.status;
 		for(int i = 0; i < 7; i++){
-			alarm_clock[size].days[i] = day[i];
+			alarm_clock[size].days[i] = alarm.days[i];
 		}
 		size++;
 	}
 }
 
 //function to edit alarm (not yet used)
-void Alarm_editAlarm(int hour, int minute, int ids, int diff, _Bool stats, _Bool day[7]){
+void Alarm_editAlarm(Alarm_t alarm){
 	_Bool found = false;
 	int i = -1;
 	while(i < size-1 && !found){
 		i++;
-		if(alarm_clock[i].id == ids){
+		if(alarm_clock[i].id == alarm.id){
 			found = true;
 		}
 	}
 	if(found){
-		alarm_clock[i].hours = hour;
-		alarm_clock[i].minutes = minute;
-		alarm_clock[i].status = stats;
-		alarm_clock[i].difficulty = diff;
+		alarm_clock[i].hours = alarm.hours;
+		alarm_clock[i].minutes = alarm.minutes;
+		alarm_clock[i].difficulty = alarm.difficulty;
+		alarm_clock[i].questionType = alarm.questionType;
+		alarm_clock[i].status = alarm.status;
 		for(int j = 0; j < 7; j++){
-			alarm_clock[i].days[j] = day[j];
+			alarm_clock[i].days[j] = alarm.days[j];
 		}
 	}
 	else{
@@ -195,6 +181,7 @@ void Alarm_deleteAlarm(int ids){
 		alarm_clock[i].minutes = alarm_clock[size-1].minutes;
 		alarm_clock[i].id = alarm_clock[size-1].id;
 		alarm_clock[i].difficulty = alarm_clock[size-1].difficulty;
+		alarm_clock[i].questionType = alarm_clock[size-1].questionType;
 		alarm_clock[i].status = alarm_clock[size-1].status;
 		for(int j = 0; j < 7; j++){
 			alarm_clock[i].days[j] = alarm_clock[size-1].days[j];
@@ -264,6 +251,12 @@ void* displayTimeThread(void*){
 		time_t t = chrono::system_clock::to_time_t(now);
 		tm local_tm = *localtime(&t);
 		int hour = local_tm.tm_hour; 
+		if(hourToggle) {
+			hour = (hour%12);
+			if(hour == 0) {
+				hour = 12;
+			}
+		}
 		int minute = local_tm.tm_min;
 		int second = local_tm.tm_sec;
 		int weekDay = local_tm.tm_wday;
@@ -279,13 +272,11 @@ void* displayTimeThread(void*){
 		lcd.setCursor(0, 1);
 		lcd.print(buffer2);
 		lcd_mutex.unlock();
+		if(Joystick_checkDown()) {
+				toggleHours();
+		}
 		waitDelay(1, 0);
 	}
-}
-
-
-static void playSentence() {
-
 }
 
 void testUser(Alarm_t *alarm) {
@@ -293,7 +284,10 @@ void testUser(Alarm_t *alarm) {
 	int difficulty = alarm->difficulty;
 	char question[512];
 	bool answered = false;
-	int questionType = 0;
+	int questionType = alarm->questionType;
+	if(questionType == QUESTION_TYPE_RANDOM) {
+		questionType = rand() % 2;	
+	} 
 	bool pressedWrong = false;
 
 	for(int i = 0; i < 5; i++) {
@@ -303,17 +297,17 @@ void testUser(Alarm_t *alarm) {
 
 
 	//mutiple choice
-	if(questionType == 0) {
+	if(questionType == QUESTION_TYPE_MC) {
 		//read questions from json
 		json questions;
 
-		if(difficulty == 0) {
+		if(difficulty == DIFFICULTY_EASY) {
 			std::ifstream stream("questions/easy.json");
 			stream >> questions;
-		} else if(difficulty == 1) {
+		} else if(difficulty == DIFFICULTY_MEDIUM) {
 			std::ifstream stream("questions/medium.json");
 			stream >> questions;
-		} else if(difficulty == 2) {
+		} else if(difficulty == DIFFICULTY_HARD) {
 			std::ifstream stream("questions/hard.json");
 			stream >> questions;
 		}
@@ -443,7 +437,7 @@ void testUser(Alarm_t *alarm) {
 	//Arithmatic
 	} else {
 		int answer = 0;
-		if(difficulty == 0) {
+		if(difficulty == DIFFICULTY_EASY) {
 			int questionSubType = rand() % 2;
 			int arg1, arg2;
 			if(questionSubType == 0) {
@@ -459,7 +453,7 @@ void testUser(Alarm_t *alarm) {
 				sprintf (question, "%d x %d =", arg1, arg2);
 			}
 
-		} else if(difficulty == 1) {
+		} else if(difficulty == DIFFICULTY_MEDIUM) {
 			int questionSubType = rand() % 2;
 			int arg1, arg2;
 			if(questionSubType == 0) {
@@ -475,7 +469,7 @@ void testUser(Alarm_t *alarm) {
 				sprintf (question, "%d x %d =", arg1, arg2);
 			}
 
-		} else if(difficulty == 2) {
+		} else if(difficulty == DIFFICULTY_HARD) {
 			int questionSubType = rand() % 2;
 			int arg1, arg2;
 			if(questionSubType == 0) {
@@ -526,6 +520,10 @@ void testUser(Alarm_t *alarm) {
 				}
 			}
 
+			if(AudioMixer_isQueueEmpty()) {
+				AudioMixer_queueSound(&alarm_sound);
+			}
+
 			waitDelay(0, 400000000);
 
 		}
@@ -535,5 +533,13 @@ void testUser(Alarm_t *alarm) {
 	lcd_mutex.unlock();
 	if(pressedWrong) {
 		testUser(alarm);
+	}
+}
+
+void toggleHours() {
+	if(hourToggle) {
+		hourToggle = 0;
+	} else {
+		hourToggle = 1;
 	}
 }

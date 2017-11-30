@@ -1,4 +1,4 @@
-// Source: http://www.cs.sfu.ca/CourseCentral/433/bfraser/other/2015-student-howtos/BBBluetoothGuide.pdf
+// Sample Code taken from source: http://www.cs.sfu.ca/CourseCentral/433/bfraser/other/2015-student-howtos/BBBluetoothGuide.pdf
 
 #include <sys/socket.h>
 #include <unistd.h>
@@ -20,7 +20,6 @@ void Bluetooth_startServer(void)
 {
 	pthread_create(&bluetoothThreadId, NULL, runBluetoothServer, NULL);
 }
-
 
 static void *runBluetoothServer(void *arg)
 {

@@ -2,6 +2,7 @@ extends placeholders/header.pug
 block content
 	style#clock-animations.
 	link(rel='stylesheet', type='text/css', href='/stylesheets/index.css')
+	link(rel='stylesheet', type='text/css', href='/stylesheets/modifySound.css')
 	include ./mixins/alarm-item.pug
 	.clock-div
 		.clock-wrapper
@@ -23,12 +24,17 @@ block content
 				.clock-minute
 				.clock-second
 				.clock-center
+	.container
+		form(ref="uploadForm", id="uploadForm", action="/alarmSound/set", method="post", encType="multipart/form-data")
+			.form-group.upload-div
+				input.form-control.file-button(type='file', name='alarm_sound', accept='audio/*', required)
+				input.btn.btn-primary.upload-button.hvr-push(type='submit', value='Upload')
 	.alarm-div.col-xs-10
 		- for (let i = 0; i < alarms.length; i++) {
 			+alarm-item(alarms[i].time, alarms[i].level, alarms[i].identification, alarms[i].statusOn, alarms[i])
 		- }
 		if (alarms.length < 12)
 			a.a-list.col-xs-4.form-group.add-icon
-				button.btn.btn-default.btn-circle-lg(href='#', data-toggle='modal', data-target='#timeModal')
+				button#createBtn.btn.btn-default.btn-circle-lg(href='#', data-toggle='modal', data-target='#timeModal')
 					i.glyphicon.glyphicon-plus
 	script(type='text/javascript', src='javascripts/index.js')
