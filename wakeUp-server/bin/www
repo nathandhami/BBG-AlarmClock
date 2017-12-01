@@ -36,6 +36,9 @@ server.on('listening', onListening);
 var udpserver = require('../src/udp-server');
 udpserver.listen(server);
 
+var udpreciever = require('../src/udp-reciever');
+udpreciever.listen(server);
+
 /**
  * Normalize a port into a number, string, or false.
  */

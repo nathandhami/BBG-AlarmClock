@@ -27,6 +27,7 @@
 #define COMMAND_EDIT_ALARM		"editAlarm"
 #define COMMAND_DELETE_ALARM	"deleteAlarm"
 #define COMMAND_CHANGE_SOUND    "changeSound"
+#define COMMAND_CHANGE_SOUND    "triggerAlarm"
 
 
 // This macro will retrieve the data from the UDP packet
@@ -277,5 +278,35 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 	}
 
 	return totalAlarms;
+
+}
+
+void UDP_triggerAlarm(char* question) {
+	int fd;
+    if ( (fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+        perror("socket failed");
+    }
+
+    struct sockaddr_in serveraddr;
+    memset( &serveraddr, 0, sizeof(serveraddr) );
+    serveraddr.sin_family = AF_INET;
+    serveraddr.sin_port = htons( 515 );              
+    serveraddr.sin_addr.s_addr = htonl( 0x7f000001 );  
+
+    char message[MAX_RECEIVE_MESSAGE_LENGTH];
+    sprintf(message, "triggerAlarm:");
+    sprintf(message + strlen(message), question);
+    message[strlen(message)] = 0;
+
+	if (sendto( fd, message, strnlen(message, MAX_RECEIVE_MESSAGE_LENGTH), 
+			0, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) < 0 ) {
+        perror( "sendto failed" );
+    }
+    printf( "question message sent\n" );
+
+    close( fd );
+}
+
+void UDP_stopAlarm(){
 
 }

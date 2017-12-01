@@ -10,6 +10,18 @@ var dgram = require('dgram');
 var PORT = 12345;
 var HOST = '127.0.0.1';
 
+// var server1 = dgram.createSocket('udp4');
+
+// server1.on('listening', function () {
+//     var address = server1.address();
+//     console.log('UDP Server listening on ' + address.address + ":" + address.port);
+// });
+
+// server1.on('message', function (message, remote) {
+//     console.log(remote.address + ':' + remote.port +' - ' + message);
+
+// });
+
 exports.listen = function(server) {
 	io = socketio.listen(server);
 	io.set('log level 1');
@@ -159,6 +171,6 @@ function handleCommand(socket) {
 				client.close();
 	
 			});
-		});
+	});
 
 };

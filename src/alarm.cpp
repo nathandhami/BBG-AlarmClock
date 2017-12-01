@@ -1,5 +1,6 @@
 #include "alarm.h"
 #include "LiquidCrystal_I2C.h"
+#include "udp.h"
 #include <ctime>
 #include <chrono>
 #include <iostream>
@@ -110,6 +111,7 @@ void checkAlarm(int hour, int minute, int sec, int today){
 		if(hour == alarm_clock[i].hours && minute == alarm_clock[i].minutes && 
 			alarm_clock[i].status && alarm_clock[i].days[today] && sec == 0){
 			testUser(&alarm_clock[i]);
+
 		}
 	}
 }
@@ -392,6 +394,9 @@ void testUser(Alarm_t *alarm) {
 		printf("%s\n", question);
 		// questionString.erase(remove( questionString.begin(), questionString.end(), '\"' ),questionString.end());
 		printf("%s\n", answerBuffer);
+
+		//Call UDP Client to send question to front-end
+		UDP_triggerAlarm(0, question, answerBuffer);
 		
 		
 		speechInit(question, &questionWave);
@@ -486,6 +491,10 @@ void testUser(Alarm_t *alarm) {
 			}
 
 		}
+
+		// Call UDP function to send question to front-end
+		UDP_triggerAlarm(1, question, NULL);
+
 		lcd.clear();
 		lcd.setCursor(0, 0);
 		lcd.print(question);
