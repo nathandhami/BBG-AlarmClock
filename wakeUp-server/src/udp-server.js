@@ -173,4 +173,10 @@ function handleCommand(socket) {
 			});
 	});
 
+	socket.on('trigger', function() {
+
+			console.log("GOT IT");
+			socket.emit('triggerAlarm');
+	});
+
 };

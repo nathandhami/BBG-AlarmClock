@@ -15,6 +15,8 @@
 #include "defs.h"
 
 #define UDP_PORT 12345
+#define SENDING_PORT 9088
+#define SENDING_ADDRESS 0x7f000001
 #define MAX_RECEIVE_MESSAGE_LENGTH 8000
 #define REPLY_BUFFER_SIZE (1500)
 #define VALUES_PER_LINE 4
@@ -287,9 +289,6 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 void UDP_triggerAlarm(bool qType, const char* question, const char* op1, 
 					const char* op2, const char* op3, const char* op4) {
 
-	printf("Question: %s\n", question);
-	printf("OP1: %s\n", op1);
-	printf("OP3: %s\n", op2);
 	int fd;
     if ( (fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
         perror("socket failed");
@@ -298,8 +297,8 @@ void UDP_triggerAlarm(bool qType, const char* question, const char* op1,
     struct sockaddr_in serveraddr;
     memset( &serveraddr, 0, sizeof(serveraddr) );
     serveraddr.sin_family = AF_INET;
-    serveraddr.sin_port = htons(9088);              
-    serveraddr.sin_addr.s_addr = htonl( 0x7f000001 );  
+    serveraddr.sin_port = htons(SENDING_PORT);              
+    serveraddr.sin_addr.s_addr = htonl(SENDING_ADDRESS);  
 
     char message[MAX_RECEIVE_MESSAGE_LENGTH];
     sprintf(message, COMMAND_TRIGGER_ALARM);

@@ -4,6 +4,10 @@ var socket = io();
 
 $(document).ready( function() {
 
+  socket.on('connect', function(){
+    socket.emit('handshake');
+  });
+
   //generate clock animations
   var now       = new Date(),
   hourDeg   = now.getHours() / 12 * 360 + now.getMinutes() / 60 * 30,

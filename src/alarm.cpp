@@ -387,7 +387,7 @@ void testUser(Alarm_t *alarm) {
 			sprintf(answerBuffer, "A. %s, B. %s", answerArray[0].c_str(), answerArray[1].c_str());
 			//Call UDP Client to send question to front-end
 			UDP_triggerAlarm(0, question, answerArray[0].c_str(), answerArray[1].c_str(), 
-								NULL, NULL);
+								"", "");
 		} else if(questionSubType.compare("multiple") == 0) {
 			sprintf(answerBuffer, "A. %s, B. %s, C. %s, D. %s", answerArray[0].c_str(), 
 				answerArray[1].c_str(), answerArray[2].c_str(), answerArray[3].c_str());
