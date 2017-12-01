@@ -287,7 +287,9 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 void UDP_triggerAlarm(bool qType, const char* question, const char* op1, 
 					const char* op2, const char* op3, const char* op4) {
 
-	printf("IN UDP\n");
+	printf("Question: %s\n", question);
+	printf("OP1: %s\n", op1);
+	printf("OP3: %s\n", op2);
 	int fd;
     if ( (fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
         perror("socket failed");
@@ -296,7 +298,7 @@ void UDP_triggerAlarm(bool qType, const char* question, const char* op1,
     struct sockaddr_in serveraddr;
     memset( &serveraddr, 0, sizeof(serveraddr) );
     serveraddr.sin_family = AF_INET;
-    serveraddr.sin_port = htons( 515 );              
+    serveraddr.sin_port = htons(9088);              
     serveraddr.sin_addr.s_addr = htonl( 0x7f000001 );  
 
     char message[MAX_RECEIVE_MESSAGE_LENGTH];

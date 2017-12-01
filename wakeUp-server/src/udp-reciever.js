@@ -1,6 +1,8 @@
 "use strict";
 
-var PORT = 515;
+var request = require("request");
+
+var PORT = 9088;
 var HOST = '127.0.0.1';
 
 var dgram = require('dgram');
@@ -9,11 +11,10 @@ exports.listen = function(server) {
 
 	var cApp = dgram.createSocket('udp4');
 
-	console.log("hello");
-
 	cApp.on('listening', function () {
 	    var address = cApp.address();
 	    console.log('UDP Server listening on ' + address.address + ":" + address.port);
+	    cApp.emit("triggerAlarm");
 	});
 
 	cApp.on('message', function (message, remote) {
@@ -44,6 +45,8 @@ exports.listen = function(server) {
 	    		
 	    		qType = 1;
 	    	}
+
+	    	request.get("http://localhost:8088/trigger");
 
 	    }
 	    else if (commandType == "stopAlarm") {

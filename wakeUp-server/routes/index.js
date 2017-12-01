@@ -38,6 +38,12 @@ router.get('/', function(req, res, next) {
 	});
 });
 
+router.get('/trigger', function(req, res, next) {
+  console.log("IN HERE");
+  var socketClient = req.app.get('socketClient');
+  socketClient.emit("triggerAlarm");
+});
+
 router.route('/alarm/set')
   .post((req, res) => {
     var socketClient = req.app.get('socketClient');
