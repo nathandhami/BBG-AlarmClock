@@ -1,5 +1,7 @@
 'use strict';
 
+var socket = io();
+
 $(document).ready( function() {
 
   //generate clock animations
@@ -92,6 +94,10 @@ $(document).ready( function() {
 
     $("#questionBtn").val(selected);
     $("#questionBtn").text(selected);
+  });
+
+  socket.on('triggerAlarm', function(){
+    console.log("recieved!!");
   });
 
 });

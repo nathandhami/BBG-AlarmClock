@@ -27,7 +27,8 @@
 #define COMMAND_EDIT_ALARM		"editAlarm"
 #define COMMAND_DELETE_ALARM	"deleteAlarm"
 #define COMMAND_CHANGE_SOUND    "changeSound"
-#define COMMAND_CHANGE_SOUND    "triggerAlarm"
+#define COMMAND_TRIGGER_ALARM  	"triggerAlarm"
+#define COMMAND_STOP_ALARM    	"stopAlarm"
 
 
 // This macro will retrieve the data from the UDP packet
@@ -233,6 +234,8 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 			}
 		}
 
+
+
 		_Bool status = true;
 		if (strcmp(statusString, "false") == 0) {
 			status = false;
@@ -248,7 +251,7 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 		int question = QUESTION_TYPE_RANDOM;
 		if (strcmp(questionString, "Arithmetic") == 0) {
 			question = QUESTION_TYPE_ARITHMETIC;
-		} else if (strcmp(levelString, "MCQs") == 0) {
+		} else if (strcmp(questionString, "MCQs") == 0) {
 			question = QUESTION_TYPE_MC;
 		}
 
@@ -281,7 +284,10 @@ static vector<Alarm_t> parseAlarmData(char* alarmData) {
 
 }
 
-void UDP_triggerAlarm(char* question) {
+void UDP_triggerAlarm(bool qType, const char* question, const char* op1, 
+					const char* op2, const char* op3, const char* op4) {
+
+	printf("IN UDP\n");
 	int fd;
     if ( (fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
         perror("socket failed");
@@ -294,15 +300,26 @@ void UDP_triggerAlarm(char* question) {
     serveraddr.sin_addr.s_addr = htonl( 0x7f000001 );  
 
     char message[MAX_RECEIVE_MESSAGE_LENGTH];
-    sprintf(message, "triggerAlarm:");
-    sprintf(message + strlen(message), question);
+    sprintf(message, COMMAND_TRIGGER_ALARM);
+    sprintf(message + strlen(message), ":");
+    sprintf(message + strlen(message), "%s", question);
+    sprintf(message + strlen(message), ":");
+
+    // MCQ - Add answer options
+    if (!qType) {
+    	sprintf(message + strlen(message), "%s", op1); sprintf(message + strlen(message), ":");
+    	sprintf(message + strlen(message), "%s", op2); sprintf(message + strlen(message), ":");
+    	sprintf(message + strlen(message), "%s", op3); sprintf(message + strlen(message), ":");
+    	sprintf(message + strlen(message), "%s", op4); sprintf(message + strlen(message), ":");
+    }
+
     message[strlen(message)] = 0;
 
 	if (sendto( fd, message, strnlen(message, MAX_RECEIVE_MESSAGE_LENGTH), 
 			0, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) < 0 ) {
         perror( "sendto failed" );
     }
-    printf( "question message sent\n" );
+    printf("question message sent to nodejs interface\n");
 
     close( fd );
 }

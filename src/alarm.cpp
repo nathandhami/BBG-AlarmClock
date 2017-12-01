@@ -385,8 +385,15 @@ void testUser(Alarm_t *alarm) {
 		//produce single string with all options
 		if(questionSubType.compare("boolean") == 0) {
 			sprintf(answerBuffer, "A. %s, B. %s", answerArray[0].c_str(), answerArray[1].c_str());
+			//Call UDP Client to send question to front-end
+			UDP_triggerAlarm(0, question, answerArray[0].c_str(), answerArray[1].c_str(), 
+								NULL, NULL);
 		} else if(questionSubType.compare("multiple") == 0) {
-			sprintf(answerBuffer, "A. %s, B. %s, C. %s, D. %s", answerArray[0].c_str(), answerArray[1].c_str(), answerArray[2].c_str(), answerArray[3].c_str());
+			sprintf(answerBuffer, "A. %s, B. %s, C. %s, D. %s", answerArray[0].c_str(), 
+				answerArray[1].c_str(), answerArray[2].c_str(), answerArray[3].c_str());
+			//Call UDP Client to send question to front-end
+			UDP_triggerAlarm(0, question, answerArray[0].c_str(), answerArray[1].c_str(), 
+								answerArray[2].c_str(), answerArray[3].c_str());
 		}
 
 
@@ -394,9 +401,6 @@ void testUser(Alarm_t *alarm) {
 		printf("%s\n", question);
 		// questionString.erase(remove( questionString.begin(), questionString.end(), '\"' ),questionString.end());
 		printf("%s\n", answerBuffer);
-
-		//Call UDP Client to send question to front-end
-		UDP_triggerAlarm(0, question, answerBuffer);
 		
 		
 		speechInit(question, &questionWave);
@@ -493,7 +497,7 @@ void testUser(Alarm_t *alarm) {
 		}
 
 		// Call UDP function to send question to front-end
-		UDP_triggerAlarm(1, question, NULL);
+		UDP_triggerAlarm(1, question, NULL, NULL, NULL, NULL);
 
 		lcd.clear();
 		lcd.setCursor(0, 0);

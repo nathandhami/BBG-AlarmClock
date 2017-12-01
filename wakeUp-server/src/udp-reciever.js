@@ -24,10 +24,26 @@ exports.listen = function(server) {
 
 	    if (commandType == "triggerAlarm") {
 	    	var question = msgArray[1];
-	    	var answer = msgArray[2];
+	    	var answers;
+	    	var qType;
 
 	    	console.log("Question: " + question);
-	    	console.log("Answer: " + answer);
+
+	    	if (msgArray[2]) { 	// MCQ
+
+	    		qType = 0;
+	    		answers = [msgArray[2], msgArray[3]];
+	    		if (msgArray[4]) {
+	    			answers.push(msgArray[4]);
+	    			answers.push(msgArray[5]);
+	    		}
+
+	    		console.log("Answers: " + answers);
+
+	    	} else {			// Arithemtic
+	    		
+	    		qType = 1;
+	    	}
 
 	    }
 	    else if (commandType == "stopAlarm") {
