@@ -233,7 +233,7 @@ void* alarmThread(void*) {
 		int minute = local_tm.tm_min;
 		int sec = local_tm.tm_sec;
 		checkAlarm(hour, minute, sec, day);
-		waitDelay(1, 0);
+		waitDelay(0, 500000000);
 	}
 
 }
@@ -517,7 +517,21 @@ void testUser(Alarm_t *alarm) {
 				enteredAnswer.push_back(pressed);
 				if(pressed == '*') {
 					enteredAnswer.pop_back();
-					if(stoi(enteredAnswer) == answer) {
+					bool isInteger = true;
+					bool correct = false;
+					for(char& c : enteredAnswer) {
+					    if( c < '0' || c > '9' ){
+					    	isInteger = false;
+					    }
+					}
+
+					if(isInteger) {
+						if(stoi(enteredAnswer) == answer) {
+							correct = true;
+						}
+					}
+
+					if(correct) {
 						lcd.clear();
 						lcd.print("correct");
 						answered = true;
