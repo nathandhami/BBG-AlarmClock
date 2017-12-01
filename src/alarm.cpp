@@ -332,6 +332,8 @@ void testUser(Alarm_t *alarm) {
 		sprintf(question, "%s", questionJson.at("question").dump().c_str());
 		question[0] = ' ';
 		question[strlen(question) - 1] = ' ';
+
+
 		int answerNumber;
 		char answerChar;
 		char answerBuffer[256];
@@ -447,7 +449,7 @@ void testUser(Alarm_t *alarm) {
 	} else {
 		int answer = 0;
 		if(difficulty == DIFFICULTY_EASY) {
-			int questionSubType = rand() % 2;
+			int questionSubType = 2;//and() % 3;
 			int arg1, arg2;
 			if(questionSubType == 0) {
 				arg1 = rand() % 100 + 1;
@@ -460,10 +462,16 @@ void testUser(Alarm_t *alarm) {
 				arg2 = rand() % 12 + 1;
 				answer = arg1 * arg2;
 				sprintf (question, "%d x %d =", arg1, arg2);
+			} else if(questionSubType == 2) {
+				arg2 = rand() % 12 + 1;
+				answer = rand() % 12 + 1;
+				arg1 = arg2 * answer;
+				sprintf (question, "%d / %d =", arg1, arg2);
 			}
 
+
 		} else if(difficulty == DIFFICULTY_MEDIUM) {
-			int questionSubType = rand() % 2;
+			int questionSubType = rand() % 3;
 			int arg1, arg2;
 			if(questionSubType == 0) {
 				arg1 = rand() % 999 + 1;
@@ -476,10 +484,15 @@ void testUser(Alarm_t *alarm) {
 				arg2 = rand() % 99 + 1;
 				answer = arg1 * arg2;
 				sprintf (question, "%d x %d =", arg1, arg2);
+			} else if(questionSubType == 2) {
+				arg2 = rand() % 10 + 1;
+				answer = rand() % 50 + 1;
+				arg1 = arg2 * answer;
+				sprintf (question, "%d / %d =", arg1, arg2);
 			}
 
 		} else if(difficulty == DIFFICULTY_HARD) {
-			int questionSubType = rand() % 2;
+			int questionSubType = rand() % 4;
 			int arg1, arg2;
 			if(questionSubType == 0) {
 				arg1 = rand() % 999 + 1;
@@ -492,6 +505,11 @@ void testUser(Alarm_t *alarm) {
 				arg2 = rand() % 99 + 1;
 				answer = arg1 * arg2;
 				sprintf (question, "%d x %d =", arg1, arg2);
+			} else if(questionSubType == 2) {
+				arg2 = rand() % 20 + 1;
+				answer = rand() % 60 + 1;
+				arg1 = arg2 * answer;
+				sprintf (question, "%d / %d =", arg1, arg2);
 			}
 
 		}
