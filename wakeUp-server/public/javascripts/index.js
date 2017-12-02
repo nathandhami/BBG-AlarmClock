@@ -108,7 +108,7 @@ $(document).ready( function() {
       var heading = "Wake UP! It's <b>" + time + "</b>."
       $("#myTriggerModalLabel").html(heading);
 
-      if (isMCQ) {
+      if (isMCQ == "true") {
         $("#question").html("<b>Q.</b> " + question);
 
         $("#op1").html("<b>A)</b> " + answers[0]);

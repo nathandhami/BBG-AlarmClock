@@ -41,7 +41,11 @@ router.get('/', function(req, res, next) {
 router.post('/trigger', function(req, res, next) {
   var qType = xssFilters.inHTMLData(req.body.type);
   var question = xssFilters.inHTMLData(req.body.question);
-  var answers = JSON.parse(xssFilters.inHTMLData(req.body.options));
+  var answers;
+
+  if (qType == "true") {
+    answers = JSON.parse(xssFilters.inHTMLData(req.body.options))
+  }
 
   var socketClient = req.app.get('socketClient');
   socketClient.emit("trigger", qType, question, answers);
@@ -49,7 +53,7 @@ router.post('/trigger', function(req, res, next) {
 
 router.post('/stop', function(req, res, next) {
   var socketClient = req.app.get('socketClient');
-  socketClient.emit("stop", qType, question, answers);
+  socketClient.emit("stop");
 });
 
 router.route('/alarm/set')
