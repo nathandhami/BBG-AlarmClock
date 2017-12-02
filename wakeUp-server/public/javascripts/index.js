@@ -104,6 +104,13 @@ $(document).ready( function() {
 
       $('#triggerModal').modal('show');
 
+      // reset first
+      $("#op1").html("");
+      $("#op2").html("");
+      $("#op3").html("");
+      $("#op4").html("");
+
+      // fill data 
       var time = getCurrentTime();
       var heading = "Wake UP! It's <b>" + time + "</b>."
       $("#myTriggerModalLabel").html(heading);
