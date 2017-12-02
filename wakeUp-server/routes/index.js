@@ -49,11 +49,15 @@ router.post('/trigger', function(req, res, next) {
 
   var socketClient = req.app.get('socketClient');
   socketClient.emit("trigger", qType, question, answers);
+
+  res.end();
 });
 
 router.post('/stop', function(req, res, next) {
   var socketClient = req.app.get('socketClient');
   socketClient.emit("stop");
+
+  res.end();
 });
 
 router.route('/alarm/set')
@@ -194,6 +198,7 @@ router.route('/alarm/status')
       }
     });
 
+    res.end();
   });
 
 module.exports = router;

@@ -402,6 +402,5 @@ input:checked + .slider:before {
 }
 
 #triggerFooter {
-    width: 30%;
-    margin: 0 auto;
+    text-align: center;
 }
