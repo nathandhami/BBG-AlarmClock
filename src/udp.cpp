@@ -327,4 +327,29 @@ void UDP_triggerAlarm(bool qType, const char* question, const char* op1,
 
 void UDP_stopAlarm(){
 
+	int fd;
+    if ( (fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+        perror("socket failed");
+    }
+
+    struct sockaddr_in serveraddr;
+    memset( &serveraddr, 0, sizeof(serveraddr) );
+    serveraddr.sin_family = AF_INET;
+    serveraddr.sin_port = htons(SENDING_PORT);              
+    serveraddr.sin_addr.s_addr = htonl(SENDING_ADDRESS);  
+
+    char message[MAX_RECEIVE_MESSAGE_LENGTH];
+    sprintf(message, COMMAND_STOP_ALARM);
+    sprintf(message + strlen(message), ":");
+
+    message[strlen(message)] = 0;
+
+	if (sendto( fd, message, strnlen(message, MAX_RECEIVE_MESSAGE_LENGTH), 
+			0, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) < 0 ) {
+        perror( "sendto failed" );
+    }
+    printf("stop message sent to nodejs interface\n");
+
+    close( fd );
+
 }

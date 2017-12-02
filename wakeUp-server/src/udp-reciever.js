@@ -43,8 +43,8 @@ exports.listen = function(server) {
 
 	    	var postData = {
 			  	type: isMCQ,
-			  	options: answers,
 	    		question: question,
+	    		options: JSON.stringify(answers),
 			}
 
 			var formData = {
@@ -58,7 +58,13 @@ exports.listen = function(server) {
 
 	    }
 	    else if (commandType == "stopAlarm") {
+	    	var formData = {
+				method: 'post',
+				json: true,
+				url: 'http://localhost:8088/stop'
+			}
 
+	    	request.post(formData);
 	    }
 
 	});

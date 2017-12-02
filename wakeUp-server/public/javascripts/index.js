@@ -100,11 +100,7 @@ $(document).ready( function() {
     $("#questionBtn").text(selected);
   });
 
-  socket.on('triggerAlarm', function(isMCQ, question, answers){
-
-      console.log(isMCQ);
-      console.log(question);
-      console.log(answers);
+  socket.on('triggerAlarm', function(isMCQ, question, answers) {
 
       $('#triggerModal').modal('show');
 
@@ -112,16 +108,22 @@ $(document).ready( function() {
       var heading = "Wake UP! It's <b>" + time + "</b>."
       $("#myTriggerModalLabel").html(heading);
 
-      $("#question").html("<b>Q.</b> " + question);
-
       if (isMCQ) {
+        $("#question").html("<b>Q.</b> " + question);
+
         $("#op1").html("<b>A)</b> " + answers[0]);
         $("#op2").html("<b>B)</b> " + answers[1]);
         if (answers[2]) {
           $("#op3").html("<b>C)</b> " + answers[2]);
           $("#op4").html("<b>D)</b> " + answers[3]);
         }
+      } else {
+        $("#question").html("<b>Q.</b> " + question + " ?");
       }
+  });
+
+  socket.on('stopAlarm', function() {
+      $('#triggerModal').modal('hide');
   });
 
 });

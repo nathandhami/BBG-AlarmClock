@@ -177,4 +177,8 @@ function handleCommand(socket) {
 			socket.broadcast.emit('triggerAlarm', qType, question, answers);
 	});
 
+	socket.on('stop', function(qType, question, answers) {
+			socket.broadcast.emit('stopAlarm');
+	});
+
 };

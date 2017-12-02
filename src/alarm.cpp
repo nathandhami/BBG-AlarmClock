@@ -431,6 +431,8 @@ void testUser(Alarm_t *alarm) {
 					lcd.clear();
 					lcd.print("WRONG!");
 					waitDelay(0, 900000000);
+				} else {
+					UDP_stopAlarm();
 				}
 			} else if(AudioMixer_isQueueEmpty()) {
 				AudioMixer_queueSound(&alarm_sound);
@@ -521,6 +523,7 @@ void testUser(Alarm_t *alarm) {
 						lcd.clear();
 						lcd.print("correct");
 						answered = true;
+						UDP_stopAlarm();
 					} else {
 						enteredAnswer.clear();
 						lcd.clear();
