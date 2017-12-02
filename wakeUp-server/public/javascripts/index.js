@@ -8,6 +8,14 @@ $(document).ready( function() {
     socket.emit('handshake');
   });
 
+  socket.on('triggerAlarm', function(qType, question, answers){
+      console.log(qType);
+      console.log(question);
+      console.log(answers);
+
+      $('#triggerModal').modal('show');
+  });
+
   //generate clock animations
   var now       = new Date(),
   hourDeg   = now.getHours() / 12 * 360 + now.getMinutes() / 60 * 30,
@@ -98,10 +106,6 @@ $(document).ready( function() {
 
     $("#questionBtn").val(selected);
     $("#questionBtn").text(selected);
-  });
-
-  socket.on('triggerAlarm', function(){
-    console.log("recieved!!");
   });
 
 });

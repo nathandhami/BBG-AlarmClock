@@ -38,10 +38,15 @@ router.get('/', function(req, res, next) {
 	});
 });
 
-router.get('/trigger', function(req, res, next) {
-  console.log("IN HERE");
+router.post('/trigger', function(req, res, next) {
+  var qType = xssFilters.inHTMLData(req.body.type);
+  var question = xssFilters.inHTMLData(req.body.question);
+  var answers = xssFilters.inHTMLData(req.body.options);
+
+  console.log("Answers: " + answers);
+
   var socketClient = req.app.get('socketClient');
-  socketClient.emit("trigger");
+  socketClient.emit("trigger", qType, question, answers);
 });
 
 router.route('/alarm/set')
