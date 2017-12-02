@@ -562,18 +562,16 @@ void testUser(Alarm_t *alarm) {
 						}
 					}
 
+					answered = true;
 					if(correct) {
 						lcd.clear();
 						lcd.print("correct");
-						answered = true;
 					} else {
 						enteredAnswer.clear();
 						lcd.clear();
-						lcd.setCursor(0, 0);
-						lcd.print(question);
-						lcd.setCursor(0, 1);
-						lcd.cursor();
-						lcd.blink();
+						lcd.print("WRONG!");
+						waitDelay(0, 900000000);
+						pressedWrong = true;
 					}
 				}
 			}
