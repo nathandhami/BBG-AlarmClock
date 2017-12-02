@@ -173,4 +173,12 @@ function handleCommand(socket) {
 			});
 	});
 
+	socket.on('trigger', function(qType, question, answers) {
+			socket.broadcast.emit('triggerAlarm', qType, question, answers);
+	});
+
+	socket.on('stop', function() {
+			socket.broadcast.emit('stopAlarm');
+	});
+
 };

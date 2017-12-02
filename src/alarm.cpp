@@ -389,7 +389,7 @@ void testUser(Alarm_t *alarm) {
 			sprintf(answerBuffer, "A. %s, B. %s", answerArray[0].c_str(), answerArray[1].c_str());
 			//Call UDP Client to send question to front-end
 			UDP_triggerAlarm(0, question, answerArray[0].c_str(), answerArray[1].c_str(), 
-								NULL, NULL);
+								"", "");
 		} else if(questionSubType.compare("multiple") == 0) {
 			sprintf(answerBuffer, "A. %s, B. %s, C. %s, D. %s", answerArray[0].c_str(), 
 				answerArray[1].c_str(), answerArray[2].c_str(), answerArray[3].c_str());
@@ -433,6 +433,8 @@ void testUser(Alarm_t *alarm) {
 					lcd.clear();
 					lcd.print("WRONG!");
 					waitDelay(0, 900000000);
+				} else {
+					UDP_stopAlarm();
 				}
 			} else if(AudioMixer_isQueueEmpty()) {
 				AudioMixer_queueSound(&alarm_sound);
@@ -566,6 +568,7 @@ void testUser(Alarm_t *alarm) {
 					if(correct) {
 						lcd.clear();
 						lcd.print("correct");
+						UDP_stopAlarm();
 					} else {
 						enteredAnswer.clear();
 						lcd.clear();

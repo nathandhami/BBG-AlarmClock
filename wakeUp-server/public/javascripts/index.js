@@ -4,6 +4,10 @@ var socket = io();
 
 $(document).ready( function() {
 
+  socket.on('connect', function(){
+    socket.emit('handshake');
+  });
+
   //generate clock animations
   var now       = new Date(),
   hourDeg   = now.getHours() / 12 * 360 + now.getMinutes() / 60 * 30,
@@ -96,9 +100,41 @@ $(document).ready( function() {
     $("#questionBtn").text(selected);
   });
 
-  socket.on('triggerAlarm', function(){
-    console.log("recieved!!");
+  socket.on('triggerAlarm', function(isMCQ, question, answers) {
+
+      $('#triggerModal').modal('show');
+
+      var time = getCurrentTime();
+      var heading = "Wake UP! It's <b>" + time + "</b>."
+      $("#myTriggerModalLabel").html(heading);
+
+      if (isMCQ == "true") {
+        $("#question").html("<b>Q.</b> " + question);
+
+        $("#op1").html("<b>A)</b> " + answers[0]);
+        $("#op2").html("<b>B)</b> " + answers[1]);
+        if (answers[2]) {
+          $("#op3").html("<b>C)</b> " + answers[2]);
+          $("#op4").html("<b>D)</b> " + answers[3]);
+        }
+      } else {
+        $("#question").html("<b>Q.</b> " + question + " ?");
+      }
+  });
+
+  socket.on('stopAlarm', function() {
+      $('#triggerModal').modal('hide');
   });
 
 });
+
+function getCurrentTime() {
+    var date = new Date();
+    var hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
+    var am_pm = date.getHours() >= 12 ? "PM" : "AM";
+    hours = hours < 10 ? "0" + hours : hours;
+    var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+    var time = hours + ":" + minutes + " " + am_pm;
+    return time;
+};
 
