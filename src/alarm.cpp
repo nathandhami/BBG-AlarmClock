@@ -448,9 +448,10 @@ void testUser(Alarm_t *alarm) {
 	//Arithmatic
 	} else {
 		int answer = 0;
+		char toSpeechQuestion[256];
+		int questionSubType = rand() % 3;
+		int arg1, arg2;
 		if(difficulty == DIFFICULTY_EASY) {
-			int questionSubType = 2;//and() % 3;
-			int arg1, arg2;
 			if(questionSubType == 0) {
 				arg1 = rand() % 100 + 1;
 				arg2 = rand() % 100 + 1;
@@ -471,8 +472,6 @@ void testUser(Alarm_t *alarm) {
 
 
 		} else if(difficulty == DIFFICULTY_MEDIUM) {
-			int questionSubType = rand() % 3;
-			int arg1, arg2;
 			if(questionSubType == 0) {
 				arg1 = rand() % 999 + 1;
 				arg2 = rand() % 100 + 1;
@@ -492,8 +491,6 @@ void testUser(Alarm_t *alarm) {
 			}
 
 		} else if(difficulty == DIFFICULTY_HARD) {
-			int questionSubType = rand() % 4;
-			int arg1, arg2;
 			if(questionSubType == 0) {
 				arg1 = rand() % 999 + 1;
 				arg2 = rand() % 999 + 1;
@@ -514,10 +511,23 @@ void testUser(Alarm_t *alarm) {
 
 		}
 
+		//set readable string
+		if(questionSubType == 0) {
+				sprintf (toSpeechQuestion, "%d plus %d equals", arg1, arg2);
+		} else if(questionSubType == 1) {
+				sprintf (toSpeechQuestion, "%d multiplied by %d equals", arg1, arg2);
+		} else if(questionSubType == 2) {
+				sprintf (toSpeechQuestion, "%d divided by %d equals", arg1, arg2);
+		}
+		speechInit(toSpeechQuestion, &questionWave);
+		AudioMixer_queueSound(&questionWave);
+
+
 		// Call UDP function to send question to front-end
 		UDP_triggerAlarm(1, question, NULL, NULL, NULL, NULL);
 
 		lcd.clear();
+
 		lcd.setCursor(0, 0);
 		lcd.print(question);
 		lcd.setCursor(0, 1);
@@ -529,6 +539,9 @@ void testUser(Alarm_t *alarm) {
 		sprintf(s, "%d", answer);
 		string enteredAnswer = "";
 		while(!answered) {
+			if(Joystick_checkUp()) {
+				AudioMixer_queueSound(&questionWave);
+			}
 			char pressed = getPressed();
 			if(pressed != ' ') {
 				lcd.write(pressed);
@@ -572,6 +585,7 @@ void testUser(Alarm_t *alarm) {
 			waitDelay(0, 400000000);
 
 		}
+		AudioMixer_freeWaveFileData(&questionWave);
 	}
 	lcd.noBlink();
 	lcd.noCursor();
