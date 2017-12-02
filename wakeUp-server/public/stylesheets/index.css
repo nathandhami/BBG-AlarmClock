@@ -396,3 +396,12 @@ input:checked + .slider:before {
 .time-select {
     width: 45%;
 }
+
+.option-row {
+    margin-left: 3em;
+}
+
+#triggerFooter {
+    width: 30%;
+    margin: 0 auto;
+}

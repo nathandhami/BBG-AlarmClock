@@ -3,10 +3,13 @@
     .modal-content
       .modal-header
         button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
-        h3#myModalLabel Wake Up! It's 05:00 PM!!!
+        h4#myTriggerModalLabel
       .modal-body
-        h4 Q. This is the Question?
-        h4 A) Hello B) Loop  
+        h5#question
+        h5#op1.row.option-row
+        h5#op2.row.option-row
+        h5#op3.row.option-row
+        h5#op4.row.option-row
       .modal-footer
-        h5 Use keypad to answer question
+        h6#triggerFooter Use keypad to answer question
 

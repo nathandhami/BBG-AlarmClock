@@ -43,8 +43,6 @@ router.post('/trigger', function(req, res, next) {
   var question = xssFilters.inHTMLData(req.body.question);
   var answers = xssFilters.inHTMLData(req.body.options);
 
-  console.log("Answers: " + answers);
-
   var socketClient = req.app.get('socketClient');
   socketClient.emit("trigger", qType, question, answers);
 });

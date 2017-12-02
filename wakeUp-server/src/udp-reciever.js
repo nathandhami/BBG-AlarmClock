@@ -41,11 +41,20 @@ exports.listen = function(server) {
 	    		isMCQ = false;
 	    	}
 
-	    	request.post('http://localhost:8088/trigger').form({
-	    		type: isMCQ,
+	    	var postData = {
+			  	type: isMCQ,
+			  	options: answers,
 	    		question: question,
-	    		options: answers,
-	    	});
+			}
+
+			var formData = {
+				method: 'post',
+				body: postData,
+				json: true,
+				url: 'http://localhost:8088/trigger'
+			}
+
+	    	request.post(formData);
 
 	    }
 	    else if (commandType == "stopAlarm") {
