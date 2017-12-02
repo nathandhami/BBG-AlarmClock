@@ -233,7 +233,7 @@ void* alarmThread(void*) {
 		int minute = local_tm.tm_min;
 		int sec = local_tm.tm_sec;
 		checkAlarm(hour, minute, sec, day);
-		waitDelay(1, 0);
+		waitDelay(0, 500000000);
 	}
 
 }
@@ -332,6 +332,8 @@ void testUser(Alarm_t *alarm) {
 		sprintf(question, "%s", questionJson.at("question").dump().c_str());
 		question[0] = ' ';
 		question[strlen(question) - 1] = ' ';
+
+
 		int answerNumber;
 		char answerChar;
 		char answerBuffer[256];
@@ -448,9 +450,10 @@ void testUser(Alarm_t *alarm) {
 	//Arithmatic
 	} else {
 		int answer = 0;
+		char toSpeechQuestion[256];
+		int questionSubType = rand() % 3;
+		int arg1, arg2;
 		if(difficulty == DIFFICULTY_EASY) {
-			int questionSubType = rand() % 2;
-			int arg1, arg2;
 			if(questionSubType == 0) {
 				arg1 = rand() % 100 + 1;
 				arg2 = rand() % 100 + 1;
@@ -462,11 +465,15 @@ void testUser(Alarm_t *alarm) {
 				arg2 = rand() % 12 + 1;
 				answer = arg1 * arg2;
 				sprintf (question, "%d x %d =", arg1, arg2);
+			} else if(questionSubType == 2) {
+				arg2 = rand() % 12 + 1;
+				answer = rand() % 12 + 1;
+				arg1 = arg2 * answer;
+				sprintf (question, "%d / %d =", arg1, arg2);
 			}
 
+
 		} else if(difficulty == DIFFICULTY_MEDIUM) {
-			int questionSubType = rand() % 2;
-			int arg1, arg2;
 			if(questionSubType == 0) {
 				arg1 = rand() % 999 + 1;
 				arg2 = rand() % 100 + 1;
@@ -478,11 +485,14 @@ void testUser(Alarm_t *alarm) {
 				arg2 = rand() % 99 + 1;
 				answer = arg1 * arg2;
 				sprintf (question, "%d x %d =", arg1, arg2);
+			} else if(questionSubType == 2) {
+				arg2 = rand() % 10 + 1;
+				answer = rand() % 50 + 1;
+				arg1 = arg2 * answer;
+				sprintf (question, "%d / %d =", arg1, arg2);
 			}
 
 		} else if(difficulty == DIFFICULTY_HARD) {
-			int questionSubType = rand() % 2;
-			int arg1, arg2;
 			if(questionSubType == 0) {
 				arg1 = rand() % 999 + 1;
 				arg2 = rand() % 999 + 1;
@@ -494,14 +504,32 @@ void testUser(Alarm_t *alarm) {
 				arg2 = rand() % 99 + 1;
 				answer = arg1 * arg2;
 				sprintf (question, "%d x %d =", arg1, arg2);
+			} else if(questionSubType == 2) {
+				arg2 = rand() % 20 + 1;
+				answer = rand() % 60 + 1;
+				arg1 = arg2 * answer;
+				sprintf (question, "%d / %d =", arg1, arg2);
 			}
 
 		}
+
+		//set readable string
+		if(questionSubType == 0) {
+				sprintf (toSpeechQuestion, "%d plus %d equals", arg1, arg2);
+		} else if(questionSubType == 1) {
+				sprintf (toSpeechQuestion, "%d multiplied by %d equals", arg1, arg2);
+		} else if(questionSubType == 2) {
+				sprintf (toSpeechQuestion, "%d divided by %d equals", arg1, arg2);
+		}
+		speechInit(toSpeechQuestion, &questionWave);
+		AudioMixer_queueSound(&questionWave);
+
 
 		// Call UDP function to send question to front-end
 		UDP_triggerAlarm(1, question, NULL, NULL, NULL, NULL);
 
 		lcd.clear();
+
 		lcd.setCursor(0, 0);
 		lcd.print(question);
 		lcd.setCursor(0, 1);
@@ -513,25 +541,40 @@ void testUser(Alarm_t *alarm) {
 		sprintf(s, "%d", answer);
 		string enteredAnswer = "";
 		while(!answered) {
+			if(Joystick_checkUp()) {
+				AudioMixer_queueSound(&questionWave);
+			}
 			char pressed = getPressed();
 			if(pressed != ' ') {
 				lcd.write(pressed);
 				enteredAnswer.push_back(pressed);
 				if(pressed == '*') {
 					enteredAnswer.pop_back();
-					if(stoi(enteredAnswer) == answer) {
+					bool isInteger = true;
+					bool correct = false;
+					for(char& c : enteredAnswer) {
+					    if( c < '0' || c > '9' ){
+					    	isInteger = false;
+					    }
+					}
+
+					if(isInteger) {
+						if(stoi(enteredAnswer) == answer) {
+							correct = true;
+						}
+					}
+
+					answered = true;
+					if(correct) {
 						lcd.clear();
 						lcd.print("correct");
-						answered = true;
 						UDP_stopAlarm();
 					} else {
 						enteredAnswer.clear();
 						lcd.clear();
-						lcd.setCursor(0, 0);
-						lcd.print(question);
-						lcd.setCursor(0, 1);
-						lcd.cursor();
-						lcd.blink();
+						lcd.print("WRONG!");
+						waitDelay(0, 900000000);
+						pressedWrong = true;
 					}
 				}
 			}
@@ -543,6 +586,7 @@ void testUser(Alarm_t *alarm) {
 			waitDelay(0, 400000000);
 
 		}
+		AudioMixer_freeWaveFileData(&questionWave);
 	}
 	lcd.noBlink();
 	lcd.noCursor();
